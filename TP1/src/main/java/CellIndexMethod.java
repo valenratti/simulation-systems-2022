@@ -14,11 +14,11 @@ public class CellIndexMethod {
         this.area = area;
     }
 
-    public void calculateNeighbours(){
+    public void calculateNeighbours(Boolean periodicBorderCondition){
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
 
         for(Cell cell : area.getCellMap().values()){
-            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn()).stream()
+            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn(), periodicBorderCondition).stream()
                     .map((coords) -> area.getCellMap().get(coords)).collect(Collectors.toList());
 
             for (Particle particle : cell.getParticleList()) {
@@ -35,20 +35,37 @@ public class CellIndexMethod {
                 }
                 neighboursMap.put(particle.getId(), currentParticleNeighbours);
             }
-            results = neighboursMap;
-            System.out.println("test");
         }
+        results = neighboursMap;
+        System.out.println("test");
     }
 
 
 
-    private List<CellCoordinates> calculateNeighbourCells(int i, int j){
+    private List<CellCoordinates> calculateNeighbourCells(int i, int j, Boolean periodicBorderCondition){
         int M = area.getCellsPerColumn();
         List<CellCoordinates> cellCoordinates = new ArrayList<>();
-        cellCoordinates.add(new CellCoordinates(i, (j + 1) % M)); //Derecha
-        cellCoordinates.add(new CellCoordinates((i + 1) % M, (j + 1) % M)); // Diagonal abajo
-        cellCoordinates.add(new CellCoordinates((i - 1 + M) % M, (j + 1) % M)); // Diagonal arriba
-        cellCoordinates.add(new CellCoordinates((i - 1 + M) % M, j)); //  Arriba
+
+        if(periodicBorderCondition) {
+            cellCoordinates.add(new CellCoordinates(i, (j + 1) % M)); //Derecha
+            cellCoordinates.add(new CellCoordinates((i + 1) % M, (j + 1) % M)); // Diagonal abajo
+            cellCoordinates.add(new CellCoordinates((i - 1 + M) % M, (j + 1) % M)); // Diagonal arriba
+            cellCoordinates.add(new CellCoordinates((i - 1 + M) % M, j)); //  Arriba
+        }
+        else {
+            boolean lastCol = j + 1 == M, firstRow = i == 0, lastRow = i + 1 == M;
+            if(!lastCol) {
+                cellCoordinates.add(new CellCoordinates(i, j + 1)); //Derecha
+                if(!lastRow)
+                    cellCoordinates.add(new CellCoordinates(i + 1, j + 1)); // Diagonal abajo
+                if(!firstRow)
+                    cellCoordinates.add(new CellCoordinates(i - 1, j + 1)); // Diagonal arriba
+            }
+
+            if(!firstRow)
+                cellCoordinates.add(new CellCoordinates(i - 1, j)); //  Arriba
+        }
+
         return cellCoordinates;
     }
 

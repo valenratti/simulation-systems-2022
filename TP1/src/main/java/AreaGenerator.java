@@ -9,6 +9,7 @@ public class AreaGenerator {
         Area area = new Area(config.getAreaLength(), finalM, config.getInteractionRadius(),
                 config.isPeriodicBorderCondition());
 
+        generateAndAddBorderParticles(area, config.getMaxParticleRadius(), config.getParticleFixedRadius()); // for testing
 
         for(int i=0; i< config.getTotalParticles(); i++){
             generateAndAddRandomParticle(area, config);
@@ -33,20 +34,36 @@ public class AreaGenerator {
     }
 
     private static void generateAndAddRandomParticle(Area area, Config config){
-        Double radius = null;
-        if(config.getMaxParticleRadius() != null){
-            radius = rand(0, config.getMaxParticleRadius());
-        }else {
-            radius = config.getParticleFixedRadius();
-        }
+        Double radius = getRadius(config.getMaxParticleRadius(), config.getParticleFixedRadius());
         double x = rand(0, area.getLength());
         double y = rand(0, area.getLength());
         Particle particle = new Particle(x, y, radius);
         area.addParticle(particle);
     }
 
+    private static Double getRadius(Double maxParticleRadius, Double particleFixedRadius) {
+        return maxParticleRadius != null ? rand(0, maxParticleRadius) : particleFixedRadius;
+    }
+
     private static double rand(double min, double max) {
         return ThreadLocalRandom.current().nextDouble(min, max);
+    }
+
+    private static void generateAndAddBorderParticles(Area area, Double maxParticleRadius, Double particleFixedRadius) {
+        Double radius = getRadius(maxParticleRadius, particleFixedRadius);
+        double length = area.getLength() - radius;
+
+        Particle particle = new Particle(0, 0, radius); // (0, 0)
+        area.addParticle(particle);
+
+        particle = new Particle(length, 0, radius); // (M, 0)
+        area.addParticle(particle);
+
+        particle = new Particle(0, length, radius); // (0, M)
+        area.addParticle(particle);
+
+        particle = new Particle(length, length, radius); // (M, M)
+        area.addParticle(particle);
     }
 
 }
