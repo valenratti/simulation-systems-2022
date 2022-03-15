@@ -1,11 +1,12 @@
-import java.util.ArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class AreaGenerator {
 
 
     public static Area initializeAreaWithConfig(Config config){
-        Area area = new Area(config.getAreaLength(), config.getCellsPerColumn(), config.getInteractionRadius(),
+
+        int finalM = calculateCellsPerColumn(config);
+        Area area = new Area(config.getAreaLength(), finalM, config.getInteractionRadius(),
                 config.isPeriodicBorderCondition());
 
 
@@ -13,6 +14,22 @@ public class AreaGenerator {
             generateAndAddRandomParticle(area, config);
         }
         return area;
+    }
+
+    private static int calculateCellsPerColumn(Config config){
+        Double maxRadius;
+        if(config.getMaxParticleRadius() != null){
+            maxRadius = config.getMaxParticleRadius();
+        }else {
+            maxRadius = config.getParticleFixedRadius();
+        }
+        if(config.getCellsPerColumn() != null){
+            if(config.getAreaLength() / (config.getCellsPerColumn()) > (maxRadius * 2 + config.getInteractionRadius()))
+                return config.getCellsPerColumn();
+        }
+
+        int possibleM = (int) Math.floor(config.getAreaLength() / (config.getInteractionRadius() + (maxRadius * 2)));
+        return possibleM == 0 ? 1 : possibleM;
     }
 
     private static void generateAndAddRandomParticle(Area area, Config config){

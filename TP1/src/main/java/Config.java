@@ -1,16 +1,16 @@
 import java.io.File;
 
 public class Config {
-    private double areaLength; //L
-    private int totalParticles; //N
-    private int cellsPerColumn; //M
-    private double interactionRadius;  //Rc
-    private boolean periodicBorderCondition;
+    private Double areaLength; //L
+    private Integer totalParticles; //N
+    private Integer cellsPerColumn; //M
+    private Double interactionRadius;  //Rc
+    private Boolean periodicBorderCondition;
     private Double particleFixedRadius;
     private Double maxParticleRadius;
     private File fileInput;
 
-    public Config(double areaLength, int totalParticles, int cellsPerColumn, double interactionRadius, boolean periodicBorderCondition, Double particleFixedRadius, Double maxParticleRadius, File fileInput) {
+    public Config(Double areaLength, Integer totalParticles, Integer cellsPerColumn, Double interactionRadius, Boolean periodicBorderCondition, Double particleFixedRadius, Double maxParticleRadius, File fileInput) {
         this.areaLength = areaLength;
         this.totalParticles = totalParticles;
         this.cellsPerColumn = cellsPerColumn;
@@ -21,39 +21,39 @@ public class Config {
         this.fileInput = fileInput;
     }
 
-    public double getAreaLength() {
+    public Double getAreaLength() {
         return areaLength;
     }
 
-    public void setAreaLength(double areaLength) {
+    public void setAreaLength(Double areaLength) {
         this.areaLength = areaLength;
     }
 
-    public int getTotalParticles() {
+    public Integer getTotalParticles() {
         return totalParticles;
     }
 
-    public void setTotalParticles(int totalParticles) {
+    public void setTotalParticles(Integer totalParticles) {
         this.totalParticles = totalParticles;
     }
 
-    public int getCellsPerColumn() {
+    public Integer getCellsPerColumn() {
         return cellsPerColumn;
     }
 
-    public void setCellsPerColumn(int cellsPerColumn) {
+    public void setCellsPerColumn(Integer cellsPerColumn) {
         this.cellsPerColumn = cellsPerColumn;
     }
 
-    public double getInteractionRadius() {
+    public Double getInteractionRadius() {
         return interactionRadius;
     }
 
-    public void setInteractionRadius(double interactionRadius) {
+    public void setInteractionRadius(Double interactionRadius) {
         this.interactionRadius = interactionRadius;
     }
 
-    public boolean isPeriodicBorderCondition() {
+    public Boolean isPeriodicBorderCondition() {
         return periodicBorderCondition;
     }
 

@@ -1,10 +1,10 @@
 import java.util.Objects;
 
 public class CellCoordinates {
-    private int column;
     private int row;
+    private int column;
 
-    public CellCoordinates(int column, int row) {
+    public CellCoordinates(int row, int column) {
         this.column = column;
         this.row = row;
     }

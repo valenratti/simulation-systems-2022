@@ -5,7 +5,7 @@ public class Cell {
     private int row;
     private List<Particle> particleList;
 
-    public Cell(int column, int row, List<Particle> particleList) {
+    public Cell(int row, int column, List<Particle> particleList) {
         this.column = column;
         this.row = row;
         this.particleList = particleList;

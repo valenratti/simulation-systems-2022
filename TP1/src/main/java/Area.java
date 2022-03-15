@@ -22,7 +22,7 @@ public class Area {
         cellMap = new HashMap<>();
         for(int i = 0; i< cellsPerColumn; i++){
             for(int j = 0; j< cellsPerColumn; j++){
-                cellMap.put(new CellCoordinates(i,j), new Cell(i,j,new ArrayList<Particle>()));
+                cellMap.put(new CellCoordinates(i,j), new Cell(i,j,new ArrayList<>()));
             }
         }
     }
@@ -38,7 +38,7 @@ public class Area {
     public void addParticle(Particle particle){
         int column = (int) Math.floor(particle.getX() / (this.getLength() / this.getCellsPerColumn()));
         int row = (int) Math.floor(particle.getY() / (this.getLength() / this.getCellsPerColumn()));
-        Cell cell = this.getCellMap().get(new CellCoordinates(column, row));
+        Cell cell = this.getCellMap().get(new CellCoordinates(row, column));
         particle.setCell(cell);
         cell.addParticle(particle);
         particleList.add(particle);
