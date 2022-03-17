@@ -9,7 +9,7 @@ public class AreaGenerator {
         Area area = new Area(config.getAreaLength(), finalM, config.getInteractionRadius(),
                 config.isPeriodicBorderCondition());
 
-        generateAndAddBorderParticles(area, config.getMaxParticleRadius(), config.getParticleFixedRadius()); // for testing
+//        generateAndAddBorderParticles(area, config.getMaxParticleRadius(), config.getParticleFixedRadius()); // for testing
 
         for(int i=0; i< config.getTotalParticles(); i++){
             generateAndAddRandomParticle(area, config);

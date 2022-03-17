@@ -1,4 +1,7 @@
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,7 +17,7 @@ public class CellIndexMethod {
         this.area = area;
     }
 
-    public void calculateNeighbours(Boolean periodicBorderCondition){
+    public void calculateNeighbours(Boolean periodicBorderCondition) throws FileNotFoundException {
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
 
         for(Cell cell : area.getCellMap().values()){
@@ -37,7 +40,6 @@ public class CellIndexMethod {
             }
         }
         results = neighboursMap;
-        System.out.println("test");
     }
 
 
@@ -67,6 +69,40 @@ public class CellIndexMethod {
         }
 
         return cellCoordinates;
+    }
+
+    public void exportPositions(String path) throws FileNotFoundException {
+        File file = new File(path);
+        FileOutputStream fos = null;
+        fos = new FileOutputStream(file);
+        PrintStream ps = new PrintStream(fos);
+        area.getParticleList().forEach((particle) -> {
+            ps.println(particle.getX() + " " + particle.getY());
+        });
+        ps.close();
+    }
+
+    public void exportNeighbours(String path) throws FileNotFoundException {
+        File file = new File(path);
+        FileOutputStream fos = null;
+        fos = new FileOutputStream(file);
+        PrintStream ps = new PrintStream(fos);
+        results.forEach((id, list) -> {
+            if(list.size() > 0) {
+                ps.println(
+                        (id) + " " + writeNeighbours(list)
+                );
+            }
+        });
+        ps.close();
+    }
+
+    private static String writeNeighbours(final List<Long> neighbours) {
+        StringBuilder list = new StringBuilder();
+        neighbours.forEach(id -> list.append(id).append(" "));
+        if(list.length() > 0)
+            return list.substring(0, list.length() - 1);
+        return list.toString();
     }
 
 }
