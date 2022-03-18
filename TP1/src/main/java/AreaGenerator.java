@@ -9,10 +9,8 @@ public class AreaGenerator {
         Area area = new Area(config.getAreaLength(), finalM, config.getInteractionRadius(),
                 config.isPeriodicBorderCondition());
 
-//        generateAndAddBorderParticles(area, config.getMaxParticleRadius(), config.getParticleFixedRadius()); // for testing
-
         for(int i=0; i< config.getTotalParticles(); i++){
-            generateAndAddRandomParticle(area, config);
+            area.addParticle(generateRandomParticle(area, config));
         }
         return area;
     }
@@ -33,12 +31,11 @@ public class AreaGenerator {
         return possibleM == 0 ? 1 : possibleM;
     }
 
-    private static void generateAndAddRandomParticle(Area area, Config config){
+    public static Particle generateRandomParticle(Area area, Config config){
         Double radius = getRadius(config.getMaxParticleRadius(), config.getParticleFixedRadius());
         double x = rand(0, area.getLength());
         double y = rand(0, area.getLength());
-        Particle particle = new Particle(x, y, radius);
-        area.addParticle(particle);
+        return new Particle(x, y, radius);
     }
 
     private static Double getRadius(Double maxParticleRadius, Double particleFixedRadius) {

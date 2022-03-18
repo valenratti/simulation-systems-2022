@@ -47,7 +47,7 @@ public class CellIndexMethod {
     private List<CellCoordinates> calculateNeighbourCells(int i, int j, Boolean periodicBorderCondition){
         int M = area.getCellsPerColumn();
         List<CellCoordinates> cellCoordinates = new ArrayList<>();
-
+        cellCoordinates.add(new CellCoordinates(i,j));
         if(periodicBorderCondition) {
             cellCoordinates.add(new CellCoordinates(i, (j + 1) % M)); //Derecha
             cellCoordinates.add(new CellCoordinates((i + 1) % M, (j + 1) % M)); // Diagonal abajo
@@ -72,37 +72,52 @@ public class CellIndexMethod {
     }
 
     public void exportPositions(String path) throws FileNotFoundException {
-        File file = new File(path);
+        File file = new File(path + ".csv");
         FileOutputStream fos = null;
         fos = new FileOutputStream(file);
         PrintStream ps = new PrintStream(fos);
+        ps.println("x,y");
         area.getParticleList().forEach((particle) -> {
-            ps.println(particle.getX() + " " + particle.getY());
+            ps.println(particle.getX() + "," + particle.getY());
         });
         ps.close();
     }
 
     public void exportNeighbours(String path) throws FileNotFoundException {
-        File file = new File(path);
+        File file = new File(path + ".csv");
         FileOutputStream fos = null;
         fos = new FileOutputStream(file);
         PrintStream ps = new PrintStream(fos);
+        ps.println("particle_id,neighbours_ids");
         results.forEach((id, list) -> {
             if(list.size() > 0) {
                 ps.println(
-                        (id) + " " + writeNeighbours(list)
+                        (id) + "," + writeNeighbours(id, list)
                 );
+            }else {
+                ps.println((id) + ", ");
             }
         });
         ps.close();
     }
 
-    private static String writeNeighbours(final List<Long> neighbours) {
+    private static String writeNeighbours(Long id, final List<Long> neighbours) {
         StringBuilder list = new StringBuilder();
-        neighbours.forEach(id -> list.append(id).append(" "));
+        neighbours.forEach(neighbourId -> {
+            if(!id.equals(neighbourId)) {
+                list.append(neighbourId).append("-");
+            }
+        });
         if(list.length() > 0)
             return list.substring(0, list.length() - 1);
         return list.toString();
     }
 
+    public Area getArea() {
+        return area;
+    }
+
+    public Map<Long, List<Long>> getResults() {
+        return results;
+    }
 }
