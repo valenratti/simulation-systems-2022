@@ -1,4 +1,3 @@
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,11 +12,16 @@ public class BruteForceMethod {
 
     public Map<Long, List<Long>> calculateNeighbours(Boolean periodicBorderCondition) {
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
+        List<Long> l;
 
-        for(Particle p1 : area.getParticleList())
-            for(Particle p2 : area.getParticleList())
-                if(!p1.getId().equals(p2.getId()) && Particle.distance(p1, p2, periodicBorderCondition, area.getLength()) < area.getRc())
-                    neighboursMap.getOrDefault(p1.getId(), new ArrayList<>()).add(p2.getId());
+        for(Particle p1 : area.getParticleList()) {
+            l = neighboursMap.getOrDefault(p1.getId(), new ArrayList<>());
+            for (Particle p2 : area.getParticleList()) {
+                if (!p1.getId().equals(p2.getId()) && Particle.distance(p1, p2, periodicBorderCondition, area.getLength()) < area.getRc())
+                    l.add(p2.getId());
+            }
+            neighboursMap.put(p1.getId(), l);
+        }
 
         return neighboursMap;
     }
