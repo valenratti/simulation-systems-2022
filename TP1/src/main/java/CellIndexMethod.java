@@ -25,7 +25,6 @@ public class CellIndexMethod {
                 cellMap.put(new CellCoordinates(i,j), new Cell(i,j,new ArrayList<>()));
             }
         }
-        cellMap = new HashMap<>();
         area.getParticleList().forEach(this::calculateParticleCell);
     }
 
@@ -36,9 +35,6 @@ public class CellIndexMethod {
         Cell cell = this.getCellMap().getOrDefault(new CellCoordinates(row, column), new Cell(row, column, new ArrayList<>()));
         particle.setCell(cell);
         cell.addParticle(particle);
-        if(cell == null){
-            System.out.println("test");
-        }
         cellMap.put(new CellCoordinates(row, column), cell);
     }
 
@@ -52,11 +48,7 @@ public class CellIndexMethod {
             for (Particle particle : cell.getParticleList()) {
                 List<Long> currentParticleNeighbours = neighboursMap.getOrDefault(particle.getId(), new ArrayList<>());
                 for(Cell neighbourCell : neighbourCells){
-                    List<Long> neighbourIds = new ArrayList<>();
-                    if(neighbourCell == null){
-                        System.out.println("test");
-                    }
-                    neighbourIds.addAll(neighbourCell.getParticleList().stream()
+                    List<Long> neighbourIds = new ArrayList<>(neighbourCell.getParticleList().stream()
                             .filter((current) -> Particle.distance(particle, current, periodicBorderCondition, area.getLength()) < area.getRc())
                             .map(Particle::getId)
                             .collect(Collectors.toList()));
