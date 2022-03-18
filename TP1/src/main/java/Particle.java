@@ -15,6 +15,10 @@ public class Particle {
         currentId += 1;
     }
 
+    public static void resetCount() {
+        currentId = 0L;
+    }
+
     public static Long getCurrentId() {
         return currentId;
     }
