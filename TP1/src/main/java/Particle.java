@@ -19,6 +19,26 @@ public class Particle {
         currentId = 0L;
     }
 
+    public static double distance(Particle p1, Particle p2, Boolean periodicBorderCondition, double length) {
+        double aux, x, y;
+        double x1 = p1.getX(), x2 = p2.getX(), y1 = p1.getY(), y2 = p2.getY(),
+                r1 = p1.getRadius(), r2 = p2.getRadius();
+
+        if(periodicBorderCondition) {
+            aux = Math.abs(x1 - x2);
+            x = Math.min(aux, Math.abs(length - aux));
+
+            aux = Math.abs(y1 - y2);
+            y = Math.min(aux, Math.abs(length - aux));
+        }
+        else {
+            x = x1 - x2;
+            y = y1 - y2;
+        }
+
+        return Math.hypot(x, y) - (r1 + r2); //hypot(x,y) returns sqrt(x^2 + y^2)
+    }
+
     public static Long getCurrentId() {
         return currentId;
     }

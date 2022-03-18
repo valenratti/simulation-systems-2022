@@ -49,14 +49,23 @@ public class CellIndexMethod {
             for (Particle particle : cell.getParticleList()) {
                 List<Long> currentParticleNeighbours = neighboursMap.getOrDefault(particle.getId(), new ArrayList<>());
                 for(Cell neighbourCell : neighbourCells){
-                    List<Long> neighboursIds = neighbourCell.getParticleList().stream()
-                            .map(Particle::getId).collect(Collectors.toList());
-                    neighboursIds.forEach((id) -> {
+                    List<Long> neighbourIds = new ArrayList<>();
+                    if(neighbourCell.equals(particle.getCell())) {
+                        neighbourIds.addAll(neighbourCell.getParticleList().stream()
+                                .map(Particle::getId).collect(Collectors.toList()));
+                    } else {
+                        neighbourIds.addAll(neighbourCell.getParticleList().stream()
+                                .filter((current) -> Particle.distance(particle, current, periodicBorderCondition, area.getLength()) < area.getRc())
+                                .map(Particle::getId)
+                                .collect(Collectors.toList()));
+                    }
+
+                    neighbourIds.forEach((id) -> {
                         List<Long> ids = neighboursMap.getOrDefault(id, new ArrayList<>());
                         ids.add(particle.getId());
                         neighboursMap.put(id, ids);
                     });
-                    currentParticleNeighbours.addAll(neighboursIds);
+                    currentParticleNeighbours.addAll(neighbourIds);
                 }
                 neighboursMap.put(particle.getId(), currentParticleNeighbours);
             }
