@@ -5,12 +5,13 @@ import java.util.Map;
 
 public class BruteForceMethod {
     private Area area;
+    private Map<Long, List<Long>> results;
 
     public BruteForceMethod(Area area) {
         this.area = area;
     }
 
-    public Map<Long, List<Long>> calculateNeighbours(Boolean periodicBorderCondition) {
+    public void calculateNeighbours(Boolean periodicBorderCondition) {
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
         List<Long> l;
 
@@ -23,8 +24,22 @@ public class BruteForceMethod {
             neighboursMap.put(p1.getId(), l);
         }
 
-        return neighboursMap;
+        this.results = neighboursMap;
     }
 
+    public Area getArea() {
+        return area;
+    }
 
+    public void setArea(Area area) {
+        this.area = area;
+    }
+
+    public Map<Long, List<Long>> getResults() {
+        return results;
+    }
+
+    public void setResults(Map<Long, List<Long>> results) {
+        this.results = results;
+    }
 }

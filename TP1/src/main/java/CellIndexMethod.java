@@ -15,11 +15,14 @@ public class CellIndexMethod {
     private Map<CellCoordinates,Cell> cellMap;
     private boolean periodicBorder;
     private int cellsPerColumn;
+    private Config config;
 
     public CellIndexMethod(Area area, Config config) {
         this.area = area;
         this.cellsPerColumn = calculateCellsPerColumn(config);
         this.cellMap = new HashMap<>();
+        this.config = config;
+
         for(int i = 0; i < cellsPerColumn; i++){
             for(int j = 0; j< cellsPerColumn; j++){
                 cellMap.put(new CellCoordinates(i,j), new Cell(i,j,new ArrayList<>()));
@@ -38,20 +41,19 @@ public class CellIndexMethod {
         cellMap.put(new CellCoordinates(row, column), cell);
     }
 
-    public void calculateNeighbours(Boolean periodicBorderCondition) throws FileNotFoundException {
+    public void calculateNeighbours() throws FileNotFoundException {
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
 
         for(Cell cell : cellMap.values()){
-            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn(), periodicBorderCondition).stream()
+            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn(), config.isPeriodicBorderCondition()).stream()
                     .map((coords) -> cellMap.get(coords)).collect(Collectors.toList());
 
             for (Particle particle : cell.getParticleList()) {
                 List<Long> currentParticleNeighbours = neighboursMap.getOrDefault(particle.getId(), new ArrayList<>());
                 for(Cell neighbourCell : neighbourCells){
-                    List<Long> neighbourIds = new ArrayList<>(neighbourCell.getParticleList().stream()
-                            .filter((current) -> Particle.distance(particle, current, periodicBorderCondition, area.getLength()) < area.getRc())
-                            .map(Particle::getId)
-                            .collect(Collectors.toList()));
+                    List<Long> neighbourIds = neighbourCell.getParticleList().stream()
+                            .filter((current) -> Particle.distance(particle, current, config.isPeriodicBorderCondition(), area.getLength()) < area.getRc())
+                            .map(Particle::getId).collect(Collectors.toList());
 
                     neighbourIds.forEach((id) -> {
                         List<Long> ids = neighboursMap.getOrDefault(id, new ArrayList<>());

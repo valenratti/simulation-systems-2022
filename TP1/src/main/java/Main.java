@@ -20,7 +20,7 @@ public class Main {
 
         final long cellStart = System.nanoTime();
         CellIndexMethod cellIndexMethod = new CellIndexMethod(area, config);
-        cellIndexMethod.calculateNeighbours(config.isPeriodicBorderCondition());
+        cellIndexMethod.calculateNeighbours();
         final long cellEnd = System.nanoTime();
 
         cellIndexMethod.exportPositions("positions");

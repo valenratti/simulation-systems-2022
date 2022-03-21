@@ -16,7 +16,7 @@ public class Area {
         this.particleList = new ArrayList<>();
     }
 
-    public Area(double length, int m, double rc, List<Particle> particleList, boolean periodicBorder) {
+    public Area(double length, double rc, List<Particle> particleList, boolean periodicBorder) {
         this.length = length;
         this.rc = rc;
         this.particleList = particleList;
