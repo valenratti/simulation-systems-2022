@@ -1,3 +1,5 @@
+package cell;
+
 public abstract class Cell {
     private int x;
     private int y;
@@ -31,5 +33,9 @@ public abstract class Cell {
 
     public void setAlive(boolean alive) {
         this.alive = alive;
+    }
+
+    public void switchState(){
+        this.alive = !this.alive;
     }
 }
