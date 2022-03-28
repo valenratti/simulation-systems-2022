@@ -3,7 +3,7 @@ package cell.impl;
 import cell.Cell;
 
 public class Cell3D extends Cell {
-    int z;
+    private int z;
     public Cell3D(int x, int y, int z, boolean alive) {
         super(x, y, alive);
         this.z = z;
