@@ -26,7 +26,7 @@ public class Simulator {
 
 
 
-        for(int i=0; i < opt.getIterations() /*&& !exist_border_particle*/; i++){
+        for(int i=0; i < opt.getIterations() /*TODO: && !exist_border_particle*/; i++){
             state = nextState(state, rule);
         }
     }
@@ -80,11 +80,11 @@ public class Simulator {
             case 3:
                 return new RuleC2D();
             case 4:
-                return new RuleA3D(1, 2, 3, 3, 3); // FIXME: Check 3D rules
+                return new RuleA3D();
             case 5:
-                return new RuleB3D(2, 4, 9, 6, 6); // FIXME: Check 3D rules
+                return new RuleB3D();
             case 6:
-                return new RuleC3D(1, 3, 3, 2, 3); // FIXME: Check 3D rules
+                return new RuleC3D();
             default: // shouldn't happen
                 throw new IllegalArgumentException("Rule parameter cause an error.");
         }
