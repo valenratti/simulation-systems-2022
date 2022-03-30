@@ -23,6 +23,10 @@ public abstract class Rule {
      * If the cell is alive, it will remain alive if it has between a1 and a2 neighbours alive. If not, it will change its state to dead.
      * If the cell is dead, it will change its state to alive if it has between d1 and d2 neighbours alive. If not, it will remain dead.
      * */
+
+    /**
+    * Returns if the cell should change it state.
+    * */
     public boolean applyRule(State state, Cell cell) {
         List<Cell> neighbours = getNeighbours(state, cell);
         int aliveNeighbours = 0;
@@ -32,7 +36,7 @@ public abstract class Rule {
                 aliveNeighbours++;
         }
 
-        return cell.isAlive() ? a1 <= aliveNeighbours && aliveNeighbours <= a2
+        return cell.isAlive() ? !(a1 <= aliveNeighbours && aliveNeighbours <= a2)
                 : d1 <= aliveNeighbours && aliveNeighbours <= d2;
     }
 }

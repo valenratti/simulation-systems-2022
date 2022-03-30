@@ -46,6 +46,13 @@ public class Grid2D extends Grid {
         return Optional.ofNullable(cells[x][y]);
     }
 
+    // For testing
+    public Cell setCell(int x, int y, boolean isAlive, State state){
+        cells[x][y].setAlive(isAlive);
+        state.getCellConditionMap().put(getCellAt(x, y).get(), isAlive);
+        return cells[x][y];
+    }
+
     /**
      * Given a cell and a radius, returns all neighbours using
      * Moore strategy

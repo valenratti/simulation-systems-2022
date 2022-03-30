@@ -36,7 +36,7 @@ public class Simulator {
      * @param currentState
      * @return
      */
-    private static State nextState(State currentState, Rule rule){
+    public static State nextState(State currentState, Rule rule){ // public for testing
         Collection<Cell> toCheckCells;
         if(currentState.getLastModified().isEmpty()){
             toCheckCells = currentState.getAliveCells();
