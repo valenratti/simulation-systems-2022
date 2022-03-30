@@ -1,19 +1,21 @@
 package rule.impl;
 
 import cell.Cell;
+import grid.impl.Grid2D;
 import rule.Rule;
 import simulation.State;
 
 import java.util.List;
 
 public class RuleC2D extends Rule {
-    public RuleC2D(int r, int a1, int a2, int d1, int d2) {
-        super(r, a1, a2, d1, d2);
+    // Made up rule
+    public RuleC2D() {
+        super(1, 3, 3, 2, 3);
     }
 
     @Override
     public List<Cell> getNeighbours(State state, Cell cell) {
-        // TODO
-        return null;
+        Grid2D grid = (Grid2D) state.getGrid();
+        return grid.getMooreNeighbours(cell, this.r);
     }
 }

@@ -24,7 +24,7 @@ public abstract class Rule {
      * If the cell is dead, it will change its state to alive if it has between d1 and d2 neighbours alive. If not, it will remain dead.
      * */
     public boolean applyRule(State state, Cell cell) {
-        List<Cell> neighbours = state.getGrid().getMooreNeighbours(cell, r);
+        List<Cell> neighbours = getNeighbours(state, cell);
         int aliveNeighbours = 0;
 
         for (Cell n : neighbours) {

@@ -8,13 +8,14 @@ import simulation.State;
 import java.util.List;
 
 public class RuleA2D extends Rule {
-    public RuleA2D(int r, int a1, int a2, int d1, int d2) {
-        super(r, a1, a2, d1, d2);
+    // Conway's rule
+    public RuleA2D() {
+        super(1, 2, 3, 3, 3);
     }
 
     @Override
     public List<Cell> getNeighbours(State state, Cell cell) {
         Grid2D grid = (Grid2D) state.getGrid();
-        return grid.getMooreNeighbours(cell, 1);
+        return grid.getMooreNeighbours(cell, this.r);
     }
 }

@@ -74,11 +74,11 @@ public class Simulator {
     private static Rule setRule(int rule) {
         switch (rule){
             case 1:
-                return new RuleA2D(1, 2, 3, 3, 3);
+                return new RuleA2D();
             case 2:
-                return new RuleB2D(2, 4, 9, 6, 6);
+                return new RuleB2D();
             case 3:
-                return new RuleC2D(1, 3, 3, 2, 3);
+                return new RuleC2D();
             case 4:
                 return new RuleA3D(1, 2, 3, 3, 3); // FIXME: Check 3D rules
             case 5:
