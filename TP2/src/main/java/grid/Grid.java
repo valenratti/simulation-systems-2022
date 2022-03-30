@@ -1,5 +1,10 @@
 package grid;
 
+import cell.Cell;
+import simulation.State;
+
+import java.util.List;
+
 public abstract class Grid {
     protected int dimension;
 
@@ -7,5 +12,7 @@ public abstract class Grid {
         this.dimension = dimension;
     }
 
-    public abstract void initialize(Grid initializationGrid);
+    public abstract void initialize(Grid initializationGrid, State state);
+
+    public abstract List<Cell> getMooreNeighbours(Cell cell, int radius);
 }

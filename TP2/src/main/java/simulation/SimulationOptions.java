@@ -44,6 +44,14 @@ public class SimulationOptions {
             throw new IllegalArgumentException("-R is not an existent rule, or it isn't applicable for the chosen space.");
     }
 
+    public SimulationOptions(Integer n, Integer dim, Integer iterations, boolean is3D, int rule) {
+        this.n = n;
+        this.dim = dim;
+        this.iterations = iterations;
+        this.is3D = is3D;
+        this.rule = rule;
+    }
+
     public Integer getN() {
         return n;
     }

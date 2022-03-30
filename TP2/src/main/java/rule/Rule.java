@@ -19,12 +19,12 @@ public abstract class Rule {
 
     public abstract List<Cell> getNeighbours(State state, Cell cell);
 
-    /*
+    /**
      * If the cell is alive, it will remain alive if it has between a1 and a2 neighbours alive. If not, it will change its state to dead.
      * If the cell is dead, it will change its state to alive if it has between d1 and d2 neighbours alive. If not, it will remain dead.
      * */
     public boolean applyRule(State state, Cell cell) {
-        List<Cell> neighbours = getNeighbours(state, cell);
+        List<Cell> neighbours = state.getGrid().getMooreNeighbours(cell, r);
         int aliveNeighbours = 0;
 
         for (Cell n : neighbours) {
@@ -34,10 +34,5 @@ public abstract class Rule {
 
         return cell.isAlive() ? a1 <= aliveNeighbours && aliveNeighbours <= a2
                 : d1 <= aliveNeighbours && aliveNeighbours <= d2;
-    }
-
-    protected List<Cell> getMooreNeighbours(Cell cell, int radius) {
-        // TODO
-        return new ArrayList<>();
     }
 }

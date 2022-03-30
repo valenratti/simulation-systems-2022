@@ -2,6 +2,9 @@ import cell.Cell;
 import grid.impl.Grid2D;
 import grid.impl.InitializationGrid2D;
 import org.junit.jupiter.api.Test;
+import simulation.SimulationOptions;
+import simulation.Simulator;
+import simulation.State;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -10,11 +13,13 @@ public class GridTest {
 
     @Test
     public void whenInitializeGrid2D_AliveParticlesShouldMatchWithInitializationGrid(){
-        InitializationGrid2D initializationGrid2D = new InitializationGrid2D(100, 500,100, 100);
+        State state = new State(1000, false);
+
+        InitializationGrid2D initializationGrid2D = new InitializationGrid2D(500, 250000,100, 100);
         initializationGrid2D.initialize();
 
         Grid2D grid2D = new Grid2D(1000);
-        grid2D.initialize(initializationGrid2D);
+        grid2D.initialize(initializationGrid2D, state);
 
         for(Cell cell : initializationGrid2D.getCellList()){
             System.out.println("cellx:" + cell.getX());
@@ -26,6 +31,12 @@ public class GridTest {
             assertTrue(grid2D.getCellAt(x,y).isPresent());
             assertTrue(grid2D.getCellAt(x, y).get().isAlive());
         }
+    }
+
+    @Test
+    public void test(){
+        SimulationOptions opt = new SimulationOptions(100000, 1000, 1000, false, 1);
+        Simulator.simulate(opt);
     }
 
 

@@ -1,6 +1,7 @@
 package rule.impl;
 
 import cell.Cell;
+import grid.impl.Grid2D;
 import rule.Rule;
 import simulation.State;
 
@@ -13,7 +14,7 @@ public class RuleA2D extends Rule {
 
     @Override
     public List<Cell> getNeighbours(State state, Cell cell) {
-        // TODO
-        return null;
+        Grid2D grid = (Grid2D) state.getGrid();
+        return grid.getMooreNeighbours(cell, 1);
     }
 }

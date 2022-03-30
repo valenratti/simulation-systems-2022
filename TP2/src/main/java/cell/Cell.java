@@ -1,5 +1,7 @@
 package cell;
 
+import java.util.Objects;
+
 public abstract class Cell {
     private int x;
     private int y;
@@ -37,5 +39,18 @@ public abstract class Cell {
 
     public void switchState(){
         this.alive = !this.alive;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cell cell = (Cell) o;
+        return x == cell.x && y == cell.y;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y);
     }
 }
