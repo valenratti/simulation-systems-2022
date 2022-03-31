@@ -3,9 +3,9 @@ package cell;
 import java.util.Objects;
 
 public abstract class Cell {
-    private int x;
-    private int y;
-    private boolean alive;
+    protected int x;
+    protected int y;
+    protected boolean alive;
 
     public Cell(int x, int y, boolean alive) {
         this.x = x;
@@ -53,4 +53,6 @@ public abstract class Cell {
     public int hashCode() {
         return Objects.hash(x, y);
     }
+
+
 }

@@ -6,17 +6,23 @@ import grid.impl.InitializationGrid2D;
 import rule.Rule;
 import rule.impl.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class Simulator {
 
+    static boolean append = false;
+
     public static void simulate(SimulationOptions opt){
         State state = new State(opt.getDim(), opt.is3D());
         Rule rule = setRule(opt.getRule());
 
-        InitializationGrid2D initializationGrid2D = new InitializationGrid2D(opt.getDim()/2, opt.getN(),100, 100);
+        InitializationGrid2D initializationGrid2D = new InitializationGrid2D(opt.getDim()/4, opt.getN(),100, 100);
         initializationGrid2D.initialize();
 
         Grid2D grid2D = new Grid2D(opt.getDim());
@@ -67,7 +73,8 @@ public class Simulator {
             }
         }
         currentState.applyChanges(modifiedCells);
-        System.out.println(currentState.getAliveCells().size());
+
+        logState(currentState);
         return currentState;
     }
 
@@ -88,6 +95,25 @@ public class Simulator {
             default: // shouldn't happen
                 throw new IllegalArgumentException("Rule parameter cause an error.");
         }
+    }
+
+    private static void logState(State state) {
+        File file = new File("output.xyz");
+        FileOutputStream fos = null;
+        try {
+            fos = new FileOutputStream(file, append);
+            append = true;
+        } catch (FileNotFoundException e) {
+            return;
+        }
+        PrintStream ps = new PrintStream(fos);
+        ps.println(state.getAliveCells().size());
+        ps.println();
+        for (Cell cell : state.getAliveCells()) {
+            ps.println(cell);
+        }
+
+        ps.close();
     }
 
 }

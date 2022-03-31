@@ -65,8 +65,14 @@ public class Grid2D extends Grid {
         List<Cell> neighbours = new ArrayList<>();
         int x = cell.getX();
         int y = cell.getY();
-        for (int i = x - radius; i <= x + radius; i++) {
-            for (int j = y - radius; j <= y + radius; j++) {
+        int initialX = Math.max(x - radius, 0);
+        int finalX = Math.min(x + radius, dimension-1);
+
+        int initialY = Math.max(y - radius, 0);
+        int finalY = Math.min(y + radius, dimension-1);
+
+        for (int i = initialX; i <= finalX; i++) {
+            for (int j = initialY; j <= finalY; j++) {
                     if(i != x || j != y) {
                         Optional<Cell> maybeNeighbour = getCellAt(i, j);
                         maybeNeighbour.ifPresent(neighbours::add);
