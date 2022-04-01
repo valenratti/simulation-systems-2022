@@ -2,10 +2,12 @@ package grid.impl;
 
 import cell.Cell;
 import cell.impl.Cell2D;
+import com.sun.tools.javac.util.Pair;
 import grid.Grid;
 import utils.RandomUtils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InitializationGrid2D extends Grid2D {
@@ -31,39 +33,35 @@ public class InitializationGrid2D extends Grid2D {
      * and assign a random position
      */
     public void initializeRandom() {
-        for(int i=0; i<initialAliveAmount; i++){
-            int randX = RandomUtils.rand(0, dimension);
-            int randY = RandomUtils.rand(0, dimension);
+        Pair<Integer, Integer> p;
+        List<Pair<Integer, Integer>> possibleCoordinates = new ArrayList<>();
 
-            if(getCellAt(randX, randY).isPresent()){
-                getCellAt(randX,randY).get().switchState();
-                cells[randX][randY] = null;
-                System.out.println("removing");
-            }else {
-                Cell newCell = new Cell2D(randX, randY, true);
-                cells[randX][randY] = newCell;
-                cellList.add(newCell);
-            }
+        for(int i=0; i < dimension; i++)
+            for(int j=0; j < dimension; j++)
+                possibleCoordinates.add(new Pair<>(i, j));
 
+        Collections.shuffle(possibleCoordinates); // sort the list randomly
+
+        for(int i=0; i < initialAliveAmount; i++){
+            p = possibleCoordinates.get(i);
+            addCell(p.fst, p.snd);
         }
     }
 
     /**
      * We'll create initialAliveAmount of alive particles
-     * and assign a random position
      */
     public void initialize() {
-        for(int i=0; i<dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                Cell newCell = new Cell2D(i, j, true);
-                cells[i][j] = newCell;
-                cellList.add(newCell);
-            }
-        }
+        for(int i=0; i<dimension; i++)
+            for (int j = 0; j < dimension; j++)
+                addCell(i, j);
     }
 
-
-
+    private void addCell(int x, int y) {
+        Cell newCell = new Cell2D(x, y, true);
+        cells[x][y] = newCell;
+        cellList.add(newCell);
+    }
 
 
     public int getInitialAliveAmount() {

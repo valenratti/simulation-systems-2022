@@ -3,9 +3,12 @@ package grid.impl;
 import cell.Cell;
 import cell.impl.Cell2D;
 import cell.impl.Cell3D;
+import com.sun.tools.javac.util.Pair;
 import utils.RandomUtils;
+import utils.Triplet;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class InitializationGrid3D extends Grid3D{
@@ -16,7 +19,7 @@ public class InitializationGrid3D extends Grid3D{
     private int topLeftCornerX;
     private int topLeftCornerY;
     private int topLeftCornerZ;
-    protected List<Cell> cellList;
+    protected List<Cell3D> cellList;
 
 
     public InitializationGrid3D(int dimension, int initialAliveAmount, int topLeftCornerX, int topLeftCornerY, int topLeftCornerZ) {
@@ -24,30 +27,45 @@ public class InitializationGrid3D extends Grid3D{
         this.initialAliveAmount = initialAliveAmount;
         this.topLeftCornerX = topLeftCornerX;
         this.topLeftCornerY = topLeftCornerY;
+        this.topLeftCornerZ = topLeftCornerZ;
         cellList = new ArrayList<>();
+    }
+
+    /**
+     * We'll create initialAliveAmount of alive particles
+     */
+    public void initialize() {
+        for(int i=0; i<dimension; i++)
+            for (int j = 0; j < dimension; j++)
+                for(int k=0; k<dimension; k++)
+                    addCell(i, j, k);
     }
 
     /**
      * We'll create initialAliveAmount of alive particles
      * and assign a random position
      */
-    public void initialize() {
-        for(int i=0; i<initialAliveAmount; i++){
-            int randX = RandomUtils.rand(0, dimension);
-            int randY = RandomUtils.rand(0, dimension);
-            int randZ = RandomUtils.rand(0, dimension);
+    public void initializeRandom() {
+        Triplet t;
+        List<Triplet> possibleCoordinates = new ArrayList<>();
 
-            if(getCellAt(randX, randY, randZ).isPresent()){
-                getCellAt(randX,randY, randZ).get().switchState();
-                cellList.remove(getCellAt(randX,randY, randZ).get());
-                cells[randX][randY][randZ] = null;
-            }else {
-                Cell newCell = new Cell3D(randX, randY, randZ, true);
-                cells[randX][randY][randZ] = newCell;
-                cellList.add(newCell);
-            }
+        for(int i=0; i < dimension; i++)
+            for(int j=0; j < dimension; j++)
+                for(int k=0; k<dimension; k++)
+                    possibleCoordinates.add(new Triplet(i, j, k));
 
+        Collections.shuffle(possibleCoordinates); // sort the list randomly
+
+        for(int i=0; i < initialAliveAmount; i++){
+            t = possibleCoordinates.get(i);
+            addCell(t.getX(), t.getY(), t.getZ());
         }
+    }
+
+    private void addCell(int x, int y, int z) {
+        Cell3D newCell = new Cell3D(x, y, z,true);
+        cells[x][y][z] = newCell;
+        cellList.add(newCell);
     }
 
     public int getInitialAliveAmount() {
@@ -74,7 +92,7 @@ public class InitializationGrid3D extends Grid3D{
         this.topLeftCornerY = topLeftCornerY;
     }
 
-    public List<Cell> getCellList() {
+    public List<Cell3D> getCellList() {
         return cellList;
     }
 
@@ -86,7 +104,7 @@ public class InitializationGrid3D extends Grid3D{
         this.topLeftCornerZ = topLeftCornerZ;
     }
 
-    public void setCellList(List<Cell> cellList) {
+    public void setCellList(List<Cell3D> cellList) {
         this.cellList = cellList;
     }
 }

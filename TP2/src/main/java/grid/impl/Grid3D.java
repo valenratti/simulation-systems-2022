@@ -18,7 +18,21 @@ public class Grid3D extends Grid {
 
     @Override
     public void initialize(Grid initializationGrid, State state) {
+        InitializationGrid3D initializationGrid3D = (InitializationGrid3D) initializationGrid;
+        for(int i=0; i<dimension; i++)
+            for(int j=0; j<dimension; j++)
+                for(int k=0; k<dimension; k++)
+                cells[i][j][k] = new Cell3D(i, j, k, false);
 
+        initializationGrid3D.getCellList().forEach((cell) -> {
+            int displacedX = cell.getX() + initializationGrid3D.getTopLeftCornerX();
+            int displacedY = cell.getY() + initializationGrid3D.getTopLeftCornerY();
+            int displacedZ = cell.getZ() + initializationGrid3D.getTopLeftCornerZ();
+            cells[displacedX][displacedY][displacedZ].setAlive(cell.isAlive());
+            state.getCellConditionMap().put(getCellAt(displacedX, displacedY, displacedZ).get(), cell.isAlive());
+        });
+
+        state.setGrid(this);
     }
 
 

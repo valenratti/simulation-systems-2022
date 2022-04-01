@@ -44,16 +44,28 @@ public class Simulator {
 
         if(opt.is3D()){
             int minDim = (int) Math.ceil(Math.cbrt(opt.getN()));
-            minDim = (int) Math.ceil(minDim * 1.5);
-            InitializationGrid3D initializationGrid = new InitializationGrid3D(minDim, opt.getN(), 100, 100, 100);
-            initializationGrid.initialize();
+            InitializationGrid3D initializationGrid;
+
+            if(minDim * 1.5 < opt.getDim()){
+                minDim = (int) Math.floor(minDim * 1.5);
+                int a = (opt.getDim() - minDim) / 2;
+                initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
+                initializationGrid.initializeRandom();
+            }else {
+                int a = (opt.getDim() - minDim) / 2;
+                initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
+                initializationGrid.initialize();
+            }
+
             Grid3D grid3D = new Grid3D(opt.getDim());
             grid3D.initialize(initializationGrid, state);
-        }else{
+        }
+        else{
             InitializationGrid2D initializationGrid;
-            int minDim = (int) Math.ceil(Math.sqrt(opt.getN()));
+            int minDim = (int) Math.floor(Math.sqrt(opt.getN()));
+
             if(minDim * 1.5 < opt.getDim()){
-                minDim = (int) Math.ceil(minDim * 1.5);
+                minDim = (int) Math.floor(minDim * 1.5);
                 int a = (opt.getDim() - minDim) / 2;
                 initializationGrid = new InitializationGrid2D(minDim, opt.getN(), a, a);
                 initializationGrid.initializeRandom();
@@ -61,8 +73,8 @@ public class Simulator {
                 int a = (opt.getDim() - minDim) / 2;
                 initializationGrid = new InitializationGrid2D(minDim, opt.getN(), a, a);
                 initializationGrid.initialize();
-
             }
+
             Grid2D grid2D = new Grid2D(opt.getDim());
             grid2D.initialize(initializationGrid, state);
         }

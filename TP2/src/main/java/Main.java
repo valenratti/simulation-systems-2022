@@ -11,10 +11,9 @@ public class Main {
         for(Integer amount : amountPercentages){
             double totalParticles = Math.pow(dimension, 2);
             int n = (int) Math.floor(totalParticles * amount / 100);
-            SimulationOptions simulationOptions = new SimulationOptions(n, dimension, 500, false, 1);
-            Simulator.simulate(simulationOptions, "ruleA2D-" + amount);
+            SimulationOptions simulationOptions = new SimulationOptions(n, dimension, 500, false, 2);
+            Simulator.simulate(simulationOptions, "ruleB2D-" + amount);
         }
-
     }
 
 }
