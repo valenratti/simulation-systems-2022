@@ -21,7 +21,7 @@ public class GridTest {
         State state = new State(1000, false);
 
         InitializationGrid2D initializationGrid2D = new InitializationGrid2D(500, 250000,100, 100);
-        initializationGrid2D.initialize();
+        initializationGrid2D.initializeRandom();
 
         Grid2D grid2D = new Grid2D(1000);
         grid2D.initialize(initializationGrid2D, state);
@@ -41,7 +41,7 @@ public class GridTest {
     @Test
     public void test(){
         SimulationOptions opt = new SimulationOptions(50000, 1000, 500, false, 1);
-        Simulator.simulate(opt);
+        Simulator.simulate(opt, "output");
     }
 
     @Test
@@ -69,7 +69,7 @@ public class GridTest {
         n1.retainAll(n2); // intersection between n1 and n2 is now in n1
         n3.retainAll(n1); // intersection between the three cells is now in n3
 
-        State newState = Simulator.nextState(state, rule);
+        State newState = Simulator.nextState(state, rule, "output");
         List<Cell> aliveCells = newState.getAliveCells();
 
         assertTrue(aliveCells.contains(c1));

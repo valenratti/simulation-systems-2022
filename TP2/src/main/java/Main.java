@@ -1,11 +1,20 @@
 import simulation.SimulationOptions;
 import simulation.Simulator;
 
+import java.util.List;
+
 public class Main {
 
     public static void main(String[] args) {
-        SimulationOptions opt = new SimulationOptions(args);
-        Simulator.simulate(opt);
+        List<Integer> amountPercentages = List.of(10, 15, 25, 35, 50, 70);
+        int dimension = 500;
+        for(Integer amount : amountPercentages){
+            double totalParticles = Math.pow(dimension, 2);
+            int n = (int) Math.floor(totalParticles * amount / 100);
+            SimulationOptions simulationOptions = new SimulationOptions(n, dimension, 500, false, 1);
+            Simulator.simulate(simulationOptions, "ruleA2D-" + amount);
+        }
+
     }
 
 }

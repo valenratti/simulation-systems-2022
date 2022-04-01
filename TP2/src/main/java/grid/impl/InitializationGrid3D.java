@@ -2,23 +2,24 @@ package grid.impl;
 
 import cell.Cell;
 import cell.impl.Cell2D;
-import grid.Grid;
+import cell.impl.Cell3D;
 import utils.RandomUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class InitializationGrid2D extends Grid2D {
+public class InitializationGrid3D extends Grid3D{
 
     //Amount of alive cells for the initial state
     private int initialAliveAmount;
     //Top left corner coordinates are used to attach the initialization grid in the simulation grid
     private int topLeftCornerX;
     private int topLeftCornerY;
+    private int topLeftCornerZ;
     protected List<Cell> cellList;
 
 
-    public InitializationGrid2D(int dimension, int initialAliveAmount, int topLeftCornerX, int topLeftCornerY) {
+    public InitializationGrid3D(int dimension, int initialAliveAmount, int topLeftCornerX, int topLeftCornerY, int topLeftCornerZ) {
         super(dimension);
         this.initialAliveAmount = initialAliveAmount;
         this.topLeftCornerX = topLeftCornerX;
@@ -30,41 +31,24 @@ public class InitializationGrid2D extends Grid2D {
      * We'll create initialAliveAmount of alive particles
      * and assign a random position
      */
-    public void initializeRandom() {
+    public void initialize() {
         for(int i=0; i<initialAliveAmount; i++){
             int randX = RandomUtils.rand(0, dimension);
             int randY = RandomUtils.rand(0, dimension);
+            int randZ = RandomUtils.rand(0, dimension);
 
-            if(getCellAt(randX, randY).isPresent()){
-                getCellAt(randX,randY).get().switchState();
-                cells[randX][randY] = null;
-                System.out.println("removing");
+            if(getCellAt(randX, randY, randZ).isPresent()){
+                getCellAt(randX,randY, randZ).get().switchState();
+                cellList.remove(getCellAt(randX,randY, randZ).get());
+                cells[randX][randY][randZ] = null;
             }else {
-                Cell newCell = new Cell2D(randX, randY, true);
-                cells[randX][randY] = newCell;
+                Cell newCell = new Cell3D(randX, randY, randZ, true);
+                cells[randX][randY][randZ] = newCell;
                 cellList.add(newCell);
             }
 
         }
     }
-
-    /**
-     * We'll create initialAliveAmount of alive particles
-     * and assign a random position
-     */
-    public void initialize() {
-        for(int i=0; i<dimension; i++) {
-            for (int j = 0; j < dimension; j++) {
-                Cell newCell = new Cell2D(i, j, true);
-                cells[i][j] = newCell;
-                cellList.add(newCell);
-            }
-        }
-    }
-
-
-
-
 
     public int getInitialAliveAmount() {
         return initialAliveAmount;
@@ -92,5 +76,17 @@ public class InitializationGrid2D extends Grid2D {
 
     public List<Cell> getCellList() {
         return cellList;
+    }
+
+    public int getTopLeftCornerZ() {
+        return topLeftCornerZ;
+    }
+
+    public void setTopLeftCornerZ(int topLeftCornerZ) {
+        this.topLeftCornerZ = topLeftCornerZ;
+    }
+
+    public void setCellList(List<Cell> cellList) {
+        this.cellList = cellList;
     }
 }
