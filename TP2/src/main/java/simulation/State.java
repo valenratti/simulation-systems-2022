@@ -15,12 +15,14 @@ public class State {
     private Map<Cell, Boolean> cellConditionMap;
     private List<Cell> lastModified;
     private Grid grid;
+    private boolean stop;
 
     public State(int dimension, boolean is3D) {
         this.grid = is3D ? new Grid3D(dimension) : new Grid2D(dimension);
         this.checkedCells = new HashMap<>();
         this.lastModified = new ArrayList<>();
         this.cellConditionMap = new HashMap<>();
+        this.stop = false;
     }
 
     public void applyChanges(List<Cell> modified){
@@ -31,12 +33,15 @@ public class State {
             }else{
                 cellConditionMap.put(cell, true);
                 cell.setAlive(true);
+                if(cell.isBorder())
+                    stop = true;
             }
         }
 
         lastModified = modified;
         checkedCells.clear();
     }
+
 
     public List<Cell> getAliveCells() {
         return cellConditionMap.keySet().stream().filter((cell) -> cellConditionMap.get(cell)).collect(Collectors.toList());
@@ -77,5 +82,10 @@ public class State {
         }
 
         return maxR;
+    }
+
+    /* returns whether it exists or not an alive border cell */
+    public boolean stopCriteria() {
+        return stop;
     }
 }

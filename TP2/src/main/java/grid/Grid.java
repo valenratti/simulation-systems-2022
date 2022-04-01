@@ -15,4 +15,6 @@ public abstract class Grid {
     public abstract void initialize(Grid initializationGrid, State state);
 
     public abstract List<Cell> getMooreNeighbours(Cell cell, int radius);
+
+    protected abstract boolean isBorderCell(Cell cell);
 }

@@ -28,6 +28,7 @@ public class Grid3D extends Grid {
                 for (int k = 0; k < dimension; k++) {
                     c = new Cell3D(i, j, k, false);
                     c.setDistanceToCenter(c.distance(centerCell));
+                    c.setBorder(isBorderCell(c));
                     cells[i][j][k] = c;
                 }
             }
@@ -86,5 +87,15 @@ public class Grid3D extends Grid {
             }
         }
         return neighbours;
+    }
+
+    @Override
+    protected boolean isBorderCell(Cell cell) {
+        Cell3D cell3D = (Cell3D) cell;
+        int x = cell3D.getX();
+        int y = cell3D.getY();
+        int z = cell3D.getZ();
+
+        return x == 0 || x == dimension || y == 0 || y == dimension || z == 0 || z == dimension;
     }
 }

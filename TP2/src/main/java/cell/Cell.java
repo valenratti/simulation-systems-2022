@@ -7,6 +7,7 @@ public abstract class Cell {
     protected int y;
     protected boolean alive;
     protected double distanceToCenter;
+    protected boolean border;
 
     public Cell(int x, int y, boolean alive) {
         this.x = x;
@@ -48,6 +49,14 @@ public abstract class Cell {
 
     public void setDistanceToCenter(double distanceToCenter) {
         this.distanceToCenter = distanceToCenter;
+    }
+
+    public boolean isBorder() {
+        return border;
+    }
+
+    public void setBorder(boolean border) {
+        this.border = border;
     }
 
     @Override

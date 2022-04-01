@@ -34,6 +34,7 @@ public class Grid2D extends Grid {
             for(int j=0; j<dimension; j++){
                 c = new Cell2D(i, j, false);
                 c.setDistanceToCenter(c.distance(centerCell));
+                c.setBorder(isBorderCell(c));
                 cells[i][j] = c;
             }
         }
@@ -86,5 +87,13 @@ public class Grid2D extends Grid {
             }
         }
         return neighbours;
+    }
+
+    @Override
+    protected boolean isBorderCell(Cell cell) {
+        int x = cell.getX();
+        int y = cell.getY();
+
+        return x == 0 || x == dimension-1 || y == 0 || y == dimension-1;
     }
 }

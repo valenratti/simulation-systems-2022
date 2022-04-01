@@ -27,7 +27,7 @@ public class Simulator {
         logState(initialSimulationConditions.getState(), outputFileName);
         State currentState = initialSimulationConditions.getState();
 
-        for(int i=0; i < opt.getIterations() /*TODO: && !exist_border_particle*/; i++){
+        for(int i=0; i < opt.getIterations() && !currentState.stopCriteria(); i++){
             currentState = nextState(currentState, initialSimulationConditions.getRule(), outputFileName);
         }
     }
