@@ -1,5 +1,7 @@
 package utils;
 
+import java.util.Objects;
+
 public class Triplet {
     private Integer x, y, z;
 
@@ -31,5 +33,20 @@ public class Triplet {
 
     public void setZ(Integer z) {
         this.z = z;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Triplet triplet = (Triplet) o;
+        return Objects.equals(getX(), triplet.getX()) &&
+                Objects.equals(getY(), triplet.getY()) &&
+                Objects.equals(getZ(), triplet.getZ());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getX(), getY(), getZ());
     }
 }
