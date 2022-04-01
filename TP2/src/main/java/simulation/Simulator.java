@@ -143,19 +143,21 @@ public class Simulator {
 
     private static void logState(State state, String outputFileName) {
         File file = new File(outputFileName + ".xyz");
-        FileOutputStream fos = null;
+        FileOutputStream fos;
+
         try {
             fos = new FileOutputStream(file, append);
             append = true;
         } catch (FileNotFoundException e) {
             return;
         }
+
         PrintStream ps = new PrintStream(fos);
+
         ps.println(state.getAliveCells().size());
-        ps.println();
-        for (Cell cell : state.getAliveCells()) {
+        ps.println("R = " + state.getPatternRadius());
+        for (Cell cell : state.getAliveCells())
             ps.println(cell);
-        }
 
         ps.close();
     }

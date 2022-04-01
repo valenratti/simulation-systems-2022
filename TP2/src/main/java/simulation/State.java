@@ -1,6 +1,8 @@
 package simulation;
 
 import cell.Cell;
+import cell.impl.Cell2D;
+import cell.impl.Cell3D;
 import grid.Grid;
 import grid.impl.Grid2D;
 import grid.impl.Grid3D;
@@ -12,11 +14,10 @@ public class State {
     private Map<Cell, Boolean> checkedCells;
     private Map<Cell, Boolean> cellConditionMap;
     private List<Cell> lastModified;
-    private Cell center;
     private Grid grid;
 
     public State(int dimension, boolean is3D) {
-        this.grid = is3D ? new Grid3D(dimension) : new Grid2D(dimension); // TODO: Initialization grid
+        this.grid = is3D ? new Grid3D(dimension) : new Grid2D(dimension);
         this.checkedCells = new HashMap<>();
         this.lastModified = new ArrayList<>();
         this.cellConditionMap = new HashMap<>();
@@ -53,14 +54,6 @@ public class State {
         return checkedCells;
     }
 
-    public Cell getCenter() {
-        return center;
-    }
-
-    public void setCenter(Cell center) {
-        this.center = center;
-    }
-
     public List<Cell> getLastModified() {
         return lastModified;
     }
@@ -71,5 +64,18 @@ public class State {
 
     public Map<Cell, Boolean> getCellConditionMap() {
         return cellConditionMap;
+    }
+
+    /* returns the distance to the center of the grid of the furthest cell */
+    public double getPatternRadius() {
+        double maxR = 0, r;
+
+        for(Cell cell : getAliveCells()) {
+            r = cell.getDistanceToCenter();
+            if(maxR < r)
+                maxR = r;
+        }
+
+        return maxR;
     }
 }

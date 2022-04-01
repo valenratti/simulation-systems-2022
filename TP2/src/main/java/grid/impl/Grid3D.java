@@ -20,10 +20,18 @@ public class Grid3D extends Grid {
     @Override
     public void initialize(Grid initializationGrid, State state) {
         InitializationGrid3D initializationGrid3D = (InitializationGrid3D) initializationGrid;
-        for(int i=0; i<dimension; i++)
-            for(int j=0; j<dimension; j++)
-                for(int k=0; k<dimension; k++)
-                    cells[i][j][k] = new Cell3D(i, j, k, false);
+        int half = (int) Math.floor((double) dimension/2);
+        Cell3D c, centerCell = new Cell3D(half, half, half, false);
+
+        for(int i=0; i<dimension; i++) {
+            for(int j=0; j<dimension; j++) {
+                for (int k = 0; k < dimension; k++) {
+                    c = new Cell3D(i, j, k, false);
+                    c.setDistanceToCenter(c.distance(centerCell));
+                    cells[i][j][k] = c;
+                }
+            }
+        }
 
         initializationGrid3D.getCellList().forEach((cell) -> {
             int displacedX = cell.getX() + initializationGrid3D.getTopLeftCornerX();

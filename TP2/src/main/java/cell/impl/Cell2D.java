@@ -7,8 +7,9 @@ public class Cell2D extends Cell {
         super(x, y, alive);
     }
 
-    public double distanceTo(Cell otherCell) {
-        return Math.sqrt(Math.pow(x - otherCell.getX(), 2) + Math.pow(y - otherCell.getY(), 2));
+    @Override
+    public double distance(Cell otherCell) {
+        return Math.hypot(x - otherCell.getX(), y - otherCell.getY());
     }
 
     @Override

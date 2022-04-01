@@ -35,4 +35,11 @@ public class Cell3D extends Cell {
         return Objects.hash(x, y, z);
     }
 
+    @Override
+    public double distance(Cell otherCell) {
+        Cell3D otherCell3D = (Cell3D) otherCell;
+        return Math.sqrt(Math.pow(x - otherCell3D.getX(), 2)
+                + Math.pow(y - otherCell3D.getY(), 2) + Math.pow(z - otherCell3D.getZ(), 2));
+    }
+
 }

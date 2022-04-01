@@ -26,9 +26,15 @@ public class Grid2D extends Grid {
     @Override
     public void initialize(Grid initializationGrid, State state) {
         InitializationGrid2D initializationGrid2D = (InitializationGrid2D) initializationGrid;
+        int half = (int) Math.floor((double) dimension/2);
+        Cell2D c, centerCell = new Cell2D(half, half, false);
+
+
         for(int i=0; i<dimension; i++){
             for(int j=0; j<dimension; j++){
-                cells[i][j] = new Cell2D(i, j, false);
+                c = new Cell2D(i, j, false);
+                c.setDistanceToCenter(c.distance(centerCell));
+                cells[i][j] = c;
             }
         }
 

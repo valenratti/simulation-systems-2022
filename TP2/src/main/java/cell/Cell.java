@@ -6,6 +6,7 @@ public abstract class Cell {
     protected int x;
     protected int y;
     protected boolean alive;
+    protected double distanceToCenter;
 
     public Cell(int x, int y, boolean alive) {
         this.x = x;
@@ -41,6 +42,14 @@ public abstract class Cell {
         this.alive = !this.alive;
     }
 
+    public double getDistanceToCenter() {
+        return distanceToCenter;
+    }
+
+    public void setDistanceToCenter(double distanceToCenter) {
+        this.distanceToCenter = distanceToCenter;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -55,4 +64,5 @@ public abstract class Cell {
     }
 
 
+    public abstract double distance(Cell otherCell);
 }
