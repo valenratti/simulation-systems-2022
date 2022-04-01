@@ -19,6 +19,7 @@ public class Cell3D extends Cell {
 
     @Override
     public String toString() {
-        return Integer.toString(this.getX()) + Integer.toString(this.getY()) + Integer.toString(this.getZ());
+        return String.format("%s %s %s", this.x, this.y, this.z);
     }
+
 }

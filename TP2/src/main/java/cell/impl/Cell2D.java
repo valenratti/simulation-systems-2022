@@ -13,6 +13,6 @@ public class Cell2D extends Cell {
 
     @Override
     public String toString() {
-        return String.format("%s  %s 0", this.getX(), this.getY());
+        return String.format("%s %s 0", this.x, this.y);
     }
 }
