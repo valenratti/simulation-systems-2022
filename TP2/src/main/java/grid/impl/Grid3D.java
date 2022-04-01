@@ -14,6 +14,7 @@ public class Grid3D extends Grid {
 
     public Grid3D(int dimension) {
         super(dimension);
+        cells = new Cell[dimension][dimension][dimension];
     }
 
     @Override
@@ -22,7 +23,7 @@ public class Grid3D extends Grid {
         for(int i=0; i<dimension; i++)
             for(int j=0; j<dimension; j++)
                 for(int k=0; k<dimension; k++)
-                cells[i][j][k] = new Cell3D(i, j, k, false);
+                    cells[i][j][k] = new Cell3D(i, j, k, false);
 
         initializationGrid3D.getCellList().forEach((cell) -> {
             int displacedX = cell.getX() + initializationGrid3D.getTopLeftCornerX();

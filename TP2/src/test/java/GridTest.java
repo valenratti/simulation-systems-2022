@@ -40,7 +40,7 @@ public class GridTest {
 
     @Test
     public void test(){
-        SimulationOptions opt = new SimulationOptions(50000, 1000, 500, false, 1);
+        SimulationOptions opt = new SimulationOptions(50000, 1000, 500, 1);
         Simulator.simulate(opt, "output");
     }
 

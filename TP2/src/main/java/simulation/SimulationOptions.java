@@ -18,8 +18,7 @@ public class SimulationOptions {
     @Option(name = "-I", usage = "Number of iterations.")
     private Integer iterations = 50;
 
-    @Option(name = "-3D", usage = "Enable 3D.")
-    private boolean is3D = false;
+    private boolean is3D;
 
     @Option(name = "-R", usage = "Rule to be applied. Choose from 1 to 6.")
     private int rule;
@@ -40,16 +39,22 @@ public class SimulationOptions {
             System.exit(1);
         }
 
-        if(rule < 1 || rule > 6 || is3D && rule < 4 || !is3D && rule > 3)
-            throw new IllegalArgumentException("-R is not an existent rule, or it isn't applicable for the chosen space.");
+        if(rule < 1 || rule > 6)
+            throw new IllegalArgumentException("-R is not an existent rule.");
+
+        this.is3D = rule >=4;
     }
 
-    public SimulationOptions(Integer n, Integer dim, Integer iterations, boolean is3D, int rule) {
+    public SimulationOptions(Integer n, Integer dim, Integer iterations, int rule) {
         this.n = n;
         this.dim = dim;
         this.iterations = iterations;
-        this.is3D = is3D;
         this.rule = rule;
+
+        if(rule < 1 || rule > 6)
+            throw new IllegalArgumentException("-R is not an existent rule.");
+
+        this.is3D = rule >=4;
     }
 
     public Integer getN() {

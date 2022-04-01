@@ -9,10 +9,10 @@ public class Main {
         List<Integer> amountPercentages = List.of(10, 15, 25, 35, 50, 70);
         int dimension = 500;
         for(Integer amount : amountPercentages){
-            double totalParticles = Math.pow(dimension, 2);
+            double totalParticles = Math.pow(dimension, 3);
             int n = (int) Math.floor(totalParticles * amount / 100);
-            SimulationOptions simulationOptions = new SimulationOptions(n, dimension, 500, false, 2);
-            Simulator.simulate(simulationOptions, "ruleB2D-" + amount);
+            SimulationOptions simulationOptions = new SimulationOptions(n, dimension, 500, 4);
+            Simulator.simulate(simulationOptions, "ruleA3D-" + amount);
         }
     }
 
