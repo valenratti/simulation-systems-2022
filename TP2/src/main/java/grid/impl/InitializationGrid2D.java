@@ -2,9 +2,8 @@ package grid.impl;
 
 import cell.Cell;
 import cell.impl.Cell2D;
-import com.sun.tools.javac.util.Pair;
 import grid.Grid;
-import utils.RandomUtils;
+import utils.Pair;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,18 +32,18 @@ public class InitializationGrid2D extends Grid2D {
      * and assign a random position
      */
     public void initializeRandom() {
-        Pair<Integer, Integer> p;
-        List<Pair<Integer, Integer>> possibleCoordinates = new ArrayList<>();
+        Pair p;
+        List<Pair> possibleCoordinates = new ArrayList<>();
 
         for(int i=0; i < dimension; i++)
             for(int j=0; j < dimension; j++)
-                possibleCoordinates.add(new Pair<>(i, j));
+                possibleCoordinates.add(new Pair(i, j));
 
         Collections.shuffle(possibleCoordinates); // sort the list randomly
 
         for(int i=0; i < initialAliveAmount; i++){
             p = possibleCoordinates.get(i);
-            addCell(p.fst, p.snd);
+            addCell(p.getX(), p.getY());
         }
     }
 

@@ -34,11 +34,6 @@
             <artifactId>args4j</artifactId>
             <version>${args4j.version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun</groupId>
-            <artifactId>tools</artifactId>
-            <scope>system</scope>
-        </dependency>
 
     </dependencies>
 

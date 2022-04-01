@@ -3,7 +3,6 @@ package grid.impl;
 import cell.Cell;
 import cell.impl.Cell2D;
 import cell.impl.Cell3D;
-import com.sun.tools.javac.util.Pair;
 import utils.RandomUtils;
 import utils.Triplet;
 
