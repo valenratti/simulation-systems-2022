@@ -57,10 +57,20 @@ public class Grid3D extends Grid {
         int x = Cell3D.getX();
         int y = Cell3D.getY();
         int z = Cell3D.getZ();
-        for (int i = x - radius; i <= x + radius; i++) {
-            for (int j = y - radius; j <= y + radius; j++) {
-                for(int k = z - radius; k <= z + radius; k++) {
-                    if (i != x || j != y) {
+
+        int initialX = Math.max(x - radius, 0);
+        int finalX = Math.min(x + radius, dimension-1);
+
+        int initialY = Math.max(y - radius, 0);
+        int finalY = Math.min(y + radius, dimension-1);
+
+        int initialZ = Math.max(x - radius, 0);
+        int finalZ = Math.min(x + radius, dimension-1);
+
+        for (int i = initialX; i <= finalX; i++) {
+            for (int j = initialY; j <= finalY; j++) {
+                for(int k = initialZ; k <= finalZ; k++) {
+                    if (i != x || j != y || k != z) {
                         Optional<Cell> maybeNeighbour = getCellAt(i, j, k);
                         maybeNeighbour.ifPresent(neighbours::add);
                     }
