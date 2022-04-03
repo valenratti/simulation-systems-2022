@@ -14,6 +14,6 @@ public class Cell2D extends Cell {
 
     @Override
     public String toString() {
-        return String.format("%s %s 0", this.x, this.y);
+        return String.format("%s %s 0 %s", this.x, this.y, this.distanceToCenter);
     }
 }

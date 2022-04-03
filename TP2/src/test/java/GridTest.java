@@ -9,6 +9,7 @@ import simulation.SimulationOptions;
 import simulation.Simulator;
 import simulation.State;
 
+import java.io.FileNotFoundException;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -38,14 +39,9 @@ public class GridTest {
         }
     }
 
-    @Test
-    public void test(){
-        SimulationOptions opt = new SimulationOptions(50000, 1000, 500, 1);
-        Simulator.simulate(opt, "output");
-    }
 
     @Test
-    public void testRuleA2D(){
+    public void testRuleA2D() throws FileNotFoundException {
         State state = new State(100, false);
         Rule rule = new RuleA2D();
 
@@ -69,7 +65,7 @@ public class GridTest {
         n1.retainAll(n2); // intersection between n1 and n2 is now in n1
         n3.retainAll(n1); // intersection between the three cells is now in n3
 
-        State newState = Simulator.nextState(state, rule, "output");
+        State newState = Simulator.nextState (state, rule);
         List<Cell> aliveCells = newState.getAliveCells();
 
         assertTrue(aliveCells.contains(c1));

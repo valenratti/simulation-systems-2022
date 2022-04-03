@@ -73,8 +73,8 @@ public class Grid3D extends Grid {
         int initialY = Math.max(y - radius, 0);
         int finalY = Math.min(y + radius, dimension-1);
 
-        int initialZ = Math.max(x - radius, 0);
-        int finalZ = Math.min(x + radius, dimension-1);
+        int initialZ = Math.max(z - radius, 0);
+        int finalZ = Math.min(z + radius, dimension-1);
 
         for (int i = initialX; i <= finalX; i++) {
             for (int j = initialY; j <= finalY; j++) {

@@ -19,17 +19,24 @@ import java.util.List;
 public class Simulator {
 
     static boolean append = false;
+    static double currentAmountPercentage;
+    static boolean appendInputVsObservable = false;
 
-    public static void simulate(SimulationOptions opt, String outputFileName){
+    public static void simulate(SimulationOptions opt, double amountPercentage ) throws FileNotFoundException {
         InitialSimulationConditions initialSimulationConditions = initialize(opt);
-
-        //Initial State Logging
-        logState(initialSimulationConditions.getState(), outputFileName);
+        currentAmountPercentage = amountPercentage;
         State currentState = initialSimulationConditions.getState();
+        //Initial State Logging
+        logState(initialSimulationConditions.getState(), initialSimulationConditions.getRule().getName());
 
-        for(int i=0; i < opt.getIterations() && !currentState.stopCriteria(); i++){
-            currentState = nextState(currentState, initialSimulationConditions.getRule(), outputFileName);
+        int i=0;
+        for( ; i < opt.getIterations() && !currentState.stopCriteria(); i++){
+            System.out.printf("Iteration n: %s%n", String.valueOf(i));
+            currentState = nextState(currentState, initialSimulationConditions.getRule());
         }
+
+        writeInputVsObservable(initialSimulationConditions.getRule().getName(), amountPercentage, i);
+        System.out.printf("Iterations till end: %s%n", String.valueOf(i));
     }
 
     /**
@@ -46,15 +53,35 @@ public class Simulator {
             int minDim = (int) Math.ceil(Math.cbrt(opt.getN()));
             InitializationGrid3D initializationGrid;
 
-            if(minDim * 1.5 < opt.getDim()){
-                minDim = (int) Math.floor(minDim * 1.5);
-                int a = (opt.getDim() - minDim) / 2;
-                initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
-                initializationGrid.initializeRandom();
-            }else {
+            if(opt.getAllSpawnTogether()){
+                //If all spawn together, we will create a block with all particles spawning next to each other
                 int a = (opt.getDim() - minDim) / 2;
                 initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
                 initializationGrid.initialize();
+            }else {
+                //Otherwise,
+                if (opt.getSubDim() == null) {
+                    //If the client does not provide a particular sub-dim, we'll
+                    //calculate ourselves a dimension which can satisfy the initial particles
+                    if (minDim * 2 < opt.getDim()) {
+                        minDim = (int) Math.floor(minDim * 2);
+                        int a = (opt.getDim() - minDim) / 2;
+                        initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
+                        initializationGrid.initializeRandom();
+                    } else {
+                        //This case spawns all together because there's no more space
+                        minDim = (int) Math.floor(opt.getDim() * 0.9);
+                        int a = (opt.getDim() - minDim) / 2;
+                        initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
+                        initializationGrid.initializeRandom();
+                    }
+                } else {
+                    //Here we use the subdim provided by the user
+                    minDim = opt.getSubDim();
+                    int a = (opt.getDim() - minDim) / 2;
+                    initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
+                    initializationGrid.initializeRandom();
+                }
             }
 
             Grid3D grid3D = new Grid3D(opt.getDim());
@@ -70,9 +97,10 @@ public class Simulator {
                 initializationGrid = new InitializationGrid2D(minDim, opt.getN(), a, a);
                 initializationGrid.initializeRandom();
             }else {
+                minDim = (int) Math.floor(opt.getDim() * 0.9);
                 int a = (opt.getDim() - minDim) / 2;
                 initializationGrid = new InitializationGrid2D(minDim, opt.getN(), a, a);
-                initializationGrid.initialize();
+                initializationGrid.initializeRandom();
             }
 
             Grid2D grid2D = new Grid2D(opt.getDim());
@@ -86,7 +114,7 @@ public class Simulator {
      * @param currentState
      * @return
      */
-    public static State nextState(State currentState, Rule rule, String outputFileName){ // public for testing
+    public static State nextState(State currentState, Rule rule) throws FileNotFoundException { // public for testing
         Collection<Cell> toCheckCells;
         if(currentState.getLastModified().isEmpty()){
             toCheckCells = currentState.getAliveCells();
@@ -118,7 +146,7 @@ public class Simulator {
         }
         currentState.applyChanges(modifiedCells);
 
-        logState(currentState, outputFileName);
+        logState(currentState, rule.getName());
         return currentState;
     }
 
@@ -141,25 +169,39 @@ public class Simulator {
         }
     }
 
-    private static void logState(State state, String outputFileName) {
-        File file = new File(outputFileName + ".xyz");
+    private static void logState(State state, String outputFileName) throws FileNotFoundException {
+        File file = new File(outputFileName + '-' + currentAmountPercentage + '%' + ".xyz");
         FileOutputStream fos;
 
-        try {
-            fos = new FileOutputStream(file, append);
-            append = true;
-        } catch (FileNotFoundException e) {
-            return;
-        }
+        fos = new FileOutputStream(file, append);
+        append = true;
+
 
         PrintStream ps = new PrintStream(fos);
 
         ps.println(state.getAliveCells().size());
-        ps.println("R = " + state.getPatternRadius());
+        ps.println("R: " + state.getPatternRadius());
         for (Cell cell : state.getAliveCells())
             ps.println(cell);
-
         ps.close();
+    }
+
+    private static void writeInputVsObservable(String ruleName, double initialPercentage, int iterationsCount) throws FileNotFoundException {
+        File file = new File( "inputvsobservable.csv");
+        FileOutputStream fos;
+        if(!appendInputVsObservable) {
+            fos = new FileOutputStream(file);
+            PrintStream ps = new PrintStream(fos);
+            ps.println("rule,initial%,iterations");
+            ps.println(ruleName + "," + initialPercentage + "," + iterationsCount);
+            appendInputVsObservable = true;
+            ps.close();
+        }else {
+            fos = new FileOutputStream(file, true);
+            PrintStream ps = new PrintStream(fos);
+            ps.println(ruleName + "," + initialPercentage + "," + iterationsCount);
+            ps.close();
+        }
     }
 
 }

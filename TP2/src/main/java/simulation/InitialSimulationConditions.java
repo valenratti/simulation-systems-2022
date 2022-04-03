@@ -26,4 +26,6 @@ public class InitialSimulationConditions {
     public void setRule(Rule rule) {
         this.rule = rule;
     }
+
+
 }

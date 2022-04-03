@@ -12,7 +12,7 @@ public class RuleA3D extends Rule {
     // where 2 is the quantity of states (alive or dead)
     // and M means Moore
     public RuleA3D() {
-        super(1, 5, 7, 1, 1);
+        super(1, 5, 7, 1, 1, "ruleA3D");
     }
 
     @Override

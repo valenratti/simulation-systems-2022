@@ -45,7 +45,6 @@ public class InitializationGrid3D extends Grid3D{
      * and assign a random position
      */
     public void initializeRandom() {
-        Triplet t;
         List<Triplet> possibleCoordinates = new ArrayList<>();
 
         for(int i=0; i < dimension; i++)
@@ -54,11 +53,10 @@ public class InitializationGrid3D extends Grid3D{
                     possibleCoordinates.add(new Triplet(i, j, k));
 
         Collections.shuffle(possibleCoordinates); // sort the list randomly
-
-        for(int i=0; i < initialAliveAmount; i++){
-            t = possibleCoordinates.get(i);
+        possibleCoordinates = possibleCoordinates.subList(0, initialAliveAmount);
+        possibleCoordinates.forEach((t) -> {
             addCell(t.getX(), t.getY(), t.getZ());
-        }
+        });
     }
 
     private void addCell(int x, int y, int z) {

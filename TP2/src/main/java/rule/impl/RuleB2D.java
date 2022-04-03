@@ -10,7 +10,7 @@ import java.util.List;
 public class RuleB2D extends Rule {
     // Made up rule
     public RuleB2D() {
-        super(2, 4, 9, 6, 6);
+        super(2, 4, 9, 6, 6, "ruleB2D");
     }
 
     @Override

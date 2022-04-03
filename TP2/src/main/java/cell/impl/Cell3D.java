@@ -21,7 +21,7 @@ public class Cell3D extends Cell {
 
     @Override
     public String toString() {
-        return String.format("%s %s %s", this.x, this.y, this.z);
+        return String.format("%s %s %s %s", this.x, this.y, this.z, this.getDistanceToCenter());
     }
 
     @Override

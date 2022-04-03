@@ -10,7 +10,7 @@ import java.util.List;
 public class RuleA2D extends Rule {
     // Conway's rule
     public RuleA2D() {
-        super(1, 2, 3, 3, 3);
+        super(1, 2, 3, 3, 3, "ruleA2D");
     }
 
     @Override

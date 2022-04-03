@@ -13,6 +13,8 @@ import java.util.stream.Collectors;
 public class State {
     private Map<Cell, Boolean> checkedCells;
     private Map<Cell, Boolean> cellConditionMap;
+    private long aliveCount;
+    private final long totalCells;
     private List<Cell> lastModified;
     private Grid grid;
     private boolean stop;
@@ -23,6 +25,8 @@ public class State {
         this.lastModified = new ArrayList<>();
         this.cellConditionMap = new HashMap<>();
         this.stop = false;
+        this.aliveCount = 0;
+        this.totalCells = (int) Math.pow(dimension, is3D ? 3 : 2);
     }
 
     public void applyChanges(List<Cell> modified){
@@ -30,9 +34,11 @@ public class State {
             if(cell.isAlive()){
                 cellConditionMap.put(cell, false);
                 cell.setAlive(false);
+                aliveCount--;
             }else{
                 cellConditionMap.put(cell, true);
                 cell.setAlive(true);
+                aliveCount++;
                 if(cell.isBorder())
                     stop = true;
             }
@@ -42,9 +48,14 @@ public class State {
         checkedCells.clear();
     }
 
-
+    /**
+     * Filters map keys by alive = true
+     * @return
+     */
     public List<Cell> getAliveCells() {
-        return cellConditionMap.keySet().stream().filter((cell) -> cellConditionMap.get(cell)).collect(Collectors.toList());
+        return cellConditionMap.keySet()
+                .stream()
+                .filter((cell) -> cellConditionMap.get(cell)).collect(Collectors.toList());
     }
 
     public Grid getGrid() {
@@ -87,5 +98,9 @@ public class State {
     /* returns whether it exists or not an alive border cell */
     public boolean stopCriteria() {
         return stop;
+    }
+
+    public float getAlivePercentage(){
+        return aliveCount / totalCells;
     }
 }
