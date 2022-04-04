@@ -53,7 +53,9 @@ public class InitializationGrid3D extends Grid3D{
                     possibleCoordinates.add(new Triplet(i, j, k));
 
         Collections.shuffle(possibleCoordinates); // sort the list randomly
-        possibleCoordinates = possibleCoordinates.subList(0, initialAliveAmount);
+        if(initialAliveAmount < possibleCoordinates.size()) {
+            possibleCoordinates = possibleCoordinates.subList(0, initialAliveAmount);
+        }
         possibleCoordinates.forEach((t) -> {
             addCell(t.getX(), t.getY(), t.getZ());
         });

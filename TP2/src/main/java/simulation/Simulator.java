@@ -26,13 +26,20 @@ public class Simulator {
         InitialSimulationConditions initialSimulationConditions = initialize(opt);
         currentAmountPercentage = amountPercentage;
         State currentState = initialSimulationConditions.getState();
+        File alivePercentageFile = new File( "alivepercentage-" + amountPercentage  +".csv");
+        FileOutputStream fos = new FileOutputStream(alivePercentageFile);
+        PrintStream ps = new PrintStream(fos);
+        ps.println("rule,iteration,alivePercentage");
+        ps.println(initialSimulationConditions.getRule().getName() + ",0," + initialSimulationConditions.getState().getAlivePercentage());
+
         //Initial State Logging
         logState(initialSimulationConditions.getState(), initialSimulationConditions.getRule().getName());
-
+        System.out.println(currentState.getAlivePercentage());
         int i=0;
-        for( ; i < opt.getIterations() && !currentState.stopCriteria(); i++){
+        for( ; i < opt.getIterations() && currentState.getAliveCount() > 0 && !currentState.stopCriteria(); i++){
             System.out.printf("Iteration n: %s%n", String.valueOf(i));
             currentState = nextState(currentState, initialSimulationConditions.getRule());
+            ps.println(initialSimulationConditions.getRule().getName() + "," + String.valueOf(i+1) + "," + currentState.getAlivePercentage());
         }
 
         writeInputVsObservable(initialSimulationConditions.getRule().getName(), amountPercentage, i);
@@ -67,21 +74,19 @@ public class Simulator {
                         minDim = (int) Math.floor(minDim * 2);
                         int a = (opt.getDim() - minDim) / 2;
                         initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
-                        initializationGrid.initializeRandom();
                     } else {
                         //This case spawns all together because there's no more space
                         minDim = (int) Math.floor(opt.getDim() * 0.9);
                         int a = (opt.getDim() - minDim) / 2;
                         initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
-                        initializationGrid.initializeRandom();
                     }
                 } else {
                     //Here we use the subdim provided by the user
                     minDim = opt.getSubDim();
                     int a = (opt.getDim() - minDim) / 2;
                     initializationGrid = new InitializationGrid3D(minDim, opt.getN(), a, a, a);
-                    initializationGrid.initializeRandom();
                 }
+                initializationGrid.initializeRandom();
             }
 
             Grid3D grid3D = new Grid3D(opt.getDim());
@@ -106,6 +111,7 @@ public class Simulator {
             Grid2D grid2D = new Grid2D(opt.getDim());
             grid2D.initialize(initializationGrid, state);
         }
+        state.setAliveCount(state.getAliveCells().size());
         return new InitialSimulationConditions(state, rule);
     }
 
@@ -193,6 +199,24 @@ public class Simulator {
             fos = new FileOutputStream(file);
             PrintStream ps = new PrintStream(fos);
             ps.println("rule,initial%,iterations");
+            ps.println(ruleName + "," + initialPercentage + "," + iterationsCount);
+            appendInputVsObservable = true;
+            ps.close();
+        }else {
+            fos = new FileOutputStream(file, true);
+            PrintStream ps = new PrintStream(fos);
+            ps.println(ruleName + "," + initialPercentage + "," + iterationsCount);
+            ps.close();
+        }
+    }
+
+    private static void writeAlivePercentage(String ruleName, double initialPercentage, int iterationsCount) throws FileNotFoundException {
+        File file = new File( "inputvsobservable.csv");
+        FileOutputStream fos;
+        if(!appendInputVsObservable) {
+            fos = new FileOutputStream(file);
+            PrintStream ps = new PrintStream(fos);
+            ps.println("rule,iteration,alivePercentage");
             ps.println(ruleName + "," + initialPercentage + "," + iterationsCount);
             appendInputVsObservable = true;
             ps.close();

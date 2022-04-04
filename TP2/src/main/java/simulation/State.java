@@ -101,6 +101,14 @@ public class State {
     }
 
     public float getAlivePercentage(){
-        return aliveCount / totalCells;
+        return (float) aliveCount / (float) totalCells;
+    }
+
+    public long getAliveCount() {
+        return aliveCount;
+    }
+
+    public void setAliveCount(long aliveCount) {
+        this.aliveCount = aliveCount;
     }
 }
