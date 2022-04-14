@@ -2,29 +2,30 @@ package simulation;
 
 import org.kohsuke.args4j.Option;
 
-
 public class SimulationOptions {
-
-    @Option(name = "-N", usage = "Initial amount particles.")
+    @Option(name = "-N", usage = "Initial quantity of particles.")
     private Integer n = 100;
 
-    @Option(name = "-L", usage = "Dimension length.")
+    @Option(name = "-L", usage = "Dimension.")
     private Double length = 0.5;
 
-    @Option(name = "-BM", usage = "Big particle mass.")
-    private Double bigMass = 100.0;
+    @Option(name = "-BPM", usage = "Big particle mass.")
+    private Double bigParticleMass = 100.0;
 
-    @Option(name = "-BR", usage = "Big particle radius.")
-    private Double bigRadius = 0.05;
+    @Option(name = "-BPR", usage = "Big particle radius.")
+    private Double bigParticleRadius = 0.05;
 
-    @Option(name = "-LM", usage = "Little particle mass.")
-    private Double littleMass = 0.1;
+    @Option(name = "-SPM", usage = "Small particle mass.")
+    private Double smallParticleMass = 0.1;
 
-    @Option(name = "-LR", usage = "Little particle radius.")
-    private Double littleRadius = 0.005;
+    @Option(name = "-SPR", usage = "Small particle radius.")
+    private Double smallParticleRadius = 0.005;
 
-    @Option(name = "-V", usage = "Velocity range.")
-    private Double velocityRange = 0.1;
+    @Option(name = "-V", usage = "Velocity module.")
+    private Double velocityMod = 0.1;
+
+    @Option(name = "-DT", usage = "dt.")
+    private Double dt = 0.05;
 
     public Integer getN() {
         return n;
@@ -42,43 +43,51 @@ public class SimulationOptions {
         this.length = length;
     }
 
-    public Double getBigMass() {
-        return bigMass;
+    public Double getBigParticleMass() {
+        return bigParticleMass;
     }
 
-    public void setBigMass(Double bigMass) {
-        this.bigMass = bigMass;
+    public void setBigParticleMass(Double bigParticleMass) {
+        this.bigParticleMass = bigParticleMass;
     }
 
-    public Double getBigRadius() {
-        return bigRadius;
+    public Double getBigParticleRadius() {
+        return bigParticleRadius;
     }
 
-    public void setBigRadius(Double bigRadius) {
-        this.bigRadius = bigRadius;
+    public void setBigParticleRadius(Double bigParticleRadius) {
+        this.bigParticleRadius = bigParticleRadius;
     }
 
-    public Double getLittleMass() {
-        return littleMass;
+    public Double getSmallParticleMass() {
+        return smallParticleMass;
     }
 
-    public void setLittleMass(Double littleMass) {
-        this.littleMass = littleMass;
+    public void setSmallParticleMass(Double smallParticleMass) {
+        this.smallParticleMass = smallParticleMass;
     }
 
-    public Double getLittleRadius() {
-        return littleRadius;
+    public Double getSmallParticleRadius() {
+        return smallParticleRadius;
     }
 
-    public void setLittleRadius(Double littleRadius) {
-        this.littleRadius = littleRadius;
+    public void setSmallParticleRadius(Double smallParticleRadius) {
+        this.smallParticleRadius = smallParticleRadius;
     }
 
-    public Double getVelocityRange() {
-        return velocityRange;
+    public Double getVelocityMod() {
+        return velocityMod;
     }
 
-    public void setVelocityRange(Double velocityRange) {
-        this.velocityRange = velocityRange;
+    public void setVelocityMod(Double velocityMod) {
+        this.velocityMod = velocityMod;
+    }
+
+    public Double getDt() {
+        return dt;
+    }
+
+    public void setDt(Double dt) {
+        this.dt = dt;
     }
 }
