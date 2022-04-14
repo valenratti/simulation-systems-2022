@@ -8,6 +8,7 @@ public class Particle {
     private double radius;
     private double vx;
     private double vy;
+    private double vModule;
     private double mass;
     private boolean isBig;
 
@@ -20,6 +21,7 @@ public class Particle {
         this.vy = vy;
         this.mass = mass;
         this.isBig = isBig;
+        this.vModule = Math.hypot(vx, vy);
         currentId++;
     }
 
@@ -85,6 +87,10 @@ public class Particle {
 
     public void setBig(boolean big) {
         isBig = big;
+    }
+
+    public double getvModule() {
+        return vModule;
     }
 
     public Optional<Double> computeCollisionIfExistsWith(Particle particle) {

@@ -15,11 +15,11 @@ public class AreaInitializer {
         while(i < options.getN()){
             double ang = RandomUtils.randDouble(0, 2*Math.PI);
             double mod = RandomUtils.randDouble(0, options.getVelocityRange());
-            double x = mod * Math.cos(ang);
-            double y = mod * Math.sin(ang);
+            double vx = mod * Math.cos(ang);
+            double vy = mod * Math.sin(ang);
             Particle particle = new Particle(RandomUtils.randDouble(options.getLittleRadius(), options.getLength()-options.getLittleRadius()),
                     RandomUtils.randDouble(options.getLittleRadius(), options.getLength()-options.getLittleRadius()), options.getLittleRadius(),
-                    x, y, options.getLittleMass(), false);
+                    vx, vy, options.getLittleMass(), false);
             if(particleList.stream().noneMatch((p) -> p.overlapsWith(particle))){
                 particleList.add(particle);
                 i++;
