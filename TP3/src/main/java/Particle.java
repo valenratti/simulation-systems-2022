@@ -121,11 +121,11 @@ public class Particle {
         double radical;
         if (type == CollisionType.PARTICLE_WITH_VWALL) {
             radical = vx > 0 ? length - radius : radius;
-            return Double.compare(vx, 0D) == 0 ? Optional.empty() : Optional.of((radical - x)/vx);
+            return Double.compare(vx, 0D) == 0 ? Optional.empty() : Optional.of((radical - x) / vx);
         }
 
         radical = vy > 0 ? length - radius : radius;
-        return Double.compare(vy, 0D) == 0 ? Optional.empty() : Optional.of((radical - y)/vy);
+        return Double.compare(vy, 0D) == 0 ? Optional.empty() : Optional.of((radical - y) / vy);
     }
 
     public boolean overlapsWith(Particle particle){
@@ -134,4 +134,8 @@ public class Particle {
     }
 
 
+    public void evolve(double time) {
+        x = x + vx * time;
+        y = y + vy * time;
+    }
 }
