@@ -18,6 +18,10 @@ public class FileWriter {
     }
 
     public static void printToFile(List<Particle> particles) throws IOException {
+        if(simulationBufferedWriter == null){
+            generateXYZFile();
+        }
+
         simulationBufferedWriter.write(String.valueOf(particles.size()));
         simulationBufferedWriter.newLine();
         simulationBufferedWriter.newLine();

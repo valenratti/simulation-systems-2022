@@ -49,7 +49,6 @@ public class Collision implements Comparable<Collision>{
 
     public void crash() {
         final double p1vx = firstParticle.getVx(), p1vy = firstParticle.getVy(), p1m = firstParticle.getMass();
-        final double p2vx = secondParticle.getVx(), p2vy = secondParticle.getVy(), p2m = secondParticle.getMass();
 
         switch (collisionType) {
             case PARTICLE_WITH_VWALL:
@@ -61,6 +60,7 @@ public class Collision implements Comparable<Collision>{
                 break;
 
             case PARTICLE_WITH_PARTICLE:
+                final double p2vx = secondParticle.getVx(), p2vy = secondParticle.getVy(), p2m = secondParticle.getMass();
                 final double sigma = firstParticle.getRadius() + secondParticle.getRadius();
                 final double[] dr = {secondParticle.getX() - firstParticle.getX(), secondParticle.getY() - firstParticle.getY()};
                 final double[] dv = {p2vx - p1vx, p2vy - p1vy};

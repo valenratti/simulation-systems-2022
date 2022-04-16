@@ -1,11 +1,12 @@
 import simulation.SimulationOptions;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.PriorityQueue;
 
 public class Simulator {
 
-    public static void simulate(SimulationOptions options){
+    public static void simulate(SimulationOptions options) throws IOException {
         final Area area = AreaInitializer.initializeArea(options);
         final PriorityQueue<Collision> collisionPriorityQueue = new PriorityQueue<>();
         final List<Particle> particleList = area.getParticles();
@@ -46,7 +47,7 @@ public class Simulator {
         }
     }
 
-    private static void logParticles(List<Particle> particleList) {
-        // TODO: Implement me
+    private static void logParticles(List<Particle> particleList) throws IOException {
+        FileWriter.printToFile(particleList);
     }
 }

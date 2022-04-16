@@ -24,13 +24,12 @@ public class CollisionCalculator {
         if (particle != null) { // not a wall
             Optional<Double> optionalCollisionTime;
 
-            collisionPriorityQueue.removeIf(c -> c.getFirstParticle().equals(particle) || c.getSecondParticle().equals(particle));
+            collisionPriorityQueue.removeIf(c -> c.getFirstParticle().equals(particle) || (c.getSecondParticle() != null && c.getSecondParticle().equals(particle)) );
 
             for (Particle p2 : particleList) {
                 if (!p2.equals(particle)) {
                     optionalCollisionTime = particle.computeCollisionIfExistsWith(p2);
-                    if (optionalCollisionTime.isPresent())
-                        collisionPriorityQueue.add(new Collision(particle, p2, CollisionType.PARTICLE_WITH_PARTICLE, optionalCollisionTime.get()));
+                    optionalCollisionTime.ifPresent(aDouble -> collisionPriorityQueue.add(new Collision(particle, p2, CollisionType.PARTICLE_WITH_PARTICLE, aDouble)));
                 }
             }
 
@@ -39,14 +38,12 @@ public class CollisionCalculator {
     }
 
     private static void collisionsWithWalls(PriorityQueue<Collision> collisionPriorityQueue, double areaLength, Particle particle) {
-        Optional<Double> optionalCollisionTime;
+        //Collision with horizontal wall
+        particle.computeCollisionIfExistsWithWall(CollisionType.PARTICLE_WITH_HWALL, areaLength)
+                .ifPresent(aDouble -> collisionPriorityQueue.add(new Collision(particle, null, CollisionType.PARTICLE_WITH_HWALL, aDouble)));;
+        //Collision with vertical wall
+        particle.computeCollisionIfExistsWithWall(CollisionType.PARTICLE_WITH_VWALL, areaLength)
+                .ifPresent(aDouble -> collisionPriorityQueue.add(new Collision(particle, null, CollisionType.PARTICLE_WITH_VWALL, aDouble)));;
 
-        optionalCollisionTime = particle.computeCollisionIfExistsWithWall(CollisionType.PARTICLE_WITH_HWALL, areaLength);
-        if (optionalCollisionTime.isPresent())
-            collisionPriorityQueue.add(new Collision(particle, null, CollisionType.PARTICLE_WITH_HWALL, optionalCollisionTime.get()));
-
-        optionalCollisionTime = particle.computeCollisionIfExistsWithWall(CollisionType.PARTICLE_WITH_VWALL, areaLength);
-        if (optionalCollisionTime.isPresent())
-            collisionPriorityQueue.add(new Collision(particle, null, CollisionType.PARTICLE_WITH_VWALL, optionalCollisionTime.get()));
     }
 }
