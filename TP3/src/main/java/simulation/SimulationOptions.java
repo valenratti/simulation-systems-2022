@@ -4,28 +4,42 @@ import org.kohsuke.args4j.Option;
 
 public class SimulationOptions {
     @Option(name = "-N", usage = "Initial quantity of particles.")
-    private Integer n = 100;
+    private Integer n = 101;
 
     @Option(name = "-L", usage = "Dimension.")
-    private Double length = 0.5;
+    private Double length = 6.0;
 
     @Option(name = "-BPM", usage = "Big particle mass.")
-    private Double bigParticleMass = 100.0;
+    private Double bigParticleMass = 2.0;
 
     @Option(name = "-BPR", usage = "Big particle radius.")
-    private Double bigParticleRadius = 0.05;
+    private Double bigParticleRadius = 0.7;
 
     @Option(name = "-SPM", usage = "Small particle mass.")
-    private Double smallParticleMass = 0.1;
+    private Double smallParticleMass = 0.9;
 
     @Option(name = "-SPR", usage = "Small particle radius.")
-    private Double smallParticleRadius = 0.005;
+    private Double smallParticleRadius = 0.2;
 
     @Option(name = "-V", usage = "Velocity module.")
-    private Double velocityMod = 0.1;
+    private Double velocityMod = 1.0;
 
     @Option(name = "-DT", usage = "dt.")
     private Double dt = 0.05;
+
+    public SimulationOptions(Integer n, Double length, Double bigParticleMass, Double bigParticleRadius, Double smallParticleMass, Double smallParticleRadius, Double velocityMod, Double dt) {
+        this.n = n;
+        this.length = length;
+        this.bigParticleMass = bigParticleMass;
+        this.bigParticleRadius = bigParticleRadius;
+        this.smallParticleMass = smallParticleMass;
+        this.smallParticleRadius = smallParticleRadius;
+        this.velocityMod = velocityMod;
+        this.dt = dt;
+    }
+
+    public SimulationOptions() {
+    }
 
     public Integer getN() {
         return n;
