@@ -27,7 +27,10 @@ public class SimulationOptions {
     @Option(name = "-DT", usage = "dt.")
     private Double dt = 0.05;
 
-    public SimulationOptions(Integer n, Double length, Double bigParticleMass, Double bigParticleRadius, Double smallParticleMass, Double smallParticleRadius, Double velocityMod, Double dt) {
+    @Option(name = "-MC", usage = "Second stop criteria.")
+    private Integer maxCollisions = 1000000;
+
+    public SimulationOptions(Integer n, Double length, Double bigParticleMass, Double bigParticleRadius, Double smallParticleMass, Double smallParticleRadius, Double velocityMod, Double dt, Integer maxCollisions) {
         this.n = n;
         this.length = length;
         this.bigParticleMass = bigParticleMass;
@@ -36,6 +39,7 @@ public class SimulationOptions {
         this.smallParticleRadius = smallParticleRadius;
         this.velocityMod = velocityMod;
         this.dt = dt;
+        this.maxCollisions = maxCollisions;
     }
 
     public SimulationOptions() {
@@ -103,5 +107,13 @@ public class SimulationOptions {
 
     public void setDt(Double dt) {
         this.dt = dt;
+    }
+
+    public Integer getMaxCollisions() {
+        return maxCollisions;
+    }
+
+    public void setMaxCollisions(Integer maxCollisions) {
+        this.maxCollisions = maxCollisions;
     }
 }

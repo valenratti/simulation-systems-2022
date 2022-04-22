@@ -26,10 +26,10 @@ public class Simulator {
 
         logParticles(particleList);  // log initial state
 
-        while(!bigParticleHitWall /*TODO: && another criteria: time, events qty, etc*/){
+        while(!bigParticleHitWall && totalCollisions < options.getMaxCollisions()){
             collision = collisionPriorityQueue.peek();
             final double timeToCrash = collision.getTimeToCrash(); // TODO: chequear si es verdad que puede devolver null
-            collisionTimes.add(timeToCrash + totalTime); // TODO: chequear si es solo timeToCrash
+            collisionTimes.add(timeToCrash); // TODO: chequear si es timeToCrash + totalTime
 
             particleList.forEach(p -> p.evolve(timeToCrash)); // TODO: timeToCrash - timeSinceLastCollision ?
             timeSinceLastLog += timeToCrash;
@@ -53,6 +53,9 @@ public class Simulator {
                 timeSinceLastLog = 0;
             }
         }
+
+        System.out.println("Simulation ending cause: " +
+                (bigParticleHitWall ? "The big particle hit the wall" : "Didn't hit the wall. Max amount of collisions reached"));
 
         /* Exercise 3.1 */
         System.out.println("Frecuencia de colisiones: " + totalCollisions / totalTime); // TODO: print to fileA instead
