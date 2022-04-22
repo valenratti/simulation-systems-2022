@@ -50,4 +50,18 @@ public class Simulator {
     private static void logParticles(List<Particle> particleList) throws IOException {
         FileWriter.printToFile(particleList);
     }
+
+
+    /*
+    * The function does not simulate.
+    * It initializes the simulation and calculates de kinetic energy of the system.
+    * */
+    public static Double getKineticEnergy(SimulationOptions options) {
+        final Area area = AreaInitializer.initializeArea(options);
+        final List<Particle> particleList = area.getParticles();
+
+        return particleList.stream()
+                .mapToDouble(p -> p.getMass() / 2 * Math.pow(p.getvModule(), 2))
+                .average().orElse(0);
+    }
 }

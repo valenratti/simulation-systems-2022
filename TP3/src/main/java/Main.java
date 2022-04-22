@@ -1,4 +1,5 @@
 import simulation.SimulationOptions;
+import utils.Pair;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -45,20 +46,26 @@ public class Main {
 
     private static void ej3(SimulationOptions simulationOptions, List<Double> v0List) throws IOException {
         Double currentV = simulationOptions.getVelocityMod();
+        Double ke;
+        List<Pair> kineticEnergyList = new ArrayList<>();
 
         for (Double v : v0List) {
             simulationOptions.setVelocityMod(v);
-            Simulator.simulate(simulationOptions); // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
+            ke = Simulator.getKineticEnergy(simulationOptions); //temperature
+            kineticEnergyList.add(new Pair(v, ke));
         }
 
         simulationOptions.setVelocityMod(currentV);  // leaves it as it was
+
+        // TODO: print values to file instead
+        System.out.println(kineticEnergyList);
     }
 
     private static void ej4(SimulationOptions simulationOptions, Integer limit) throws IOException {
         // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
         Simulator.simulate(simulationOptions); // get info of 10 small particles
         for(int i=0; i < limit; i++)
-            Simulator.simulate(simulationOptions);
+            Simulator.simulate(simulationOptions); // get info of the big particle
     }
 
 }
