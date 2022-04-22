@@ -1,6 +1,8 @@
 import simulation.SimulationOptions;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
 
@@ -19,11 +21,15 @@ public class Simulator {
         boolean bigParticleHitWall = false;
         double timeSinceLastLog = 0;
 
+        double totalCollisions = 0, totalTime = 0; // for exercise 3.1
+        List<Double> collisionTimes = new ArrayList<>(); // for exercise 3.1
+
         logParticles(particleList);  // log initial state
 
         while(!bigParticleHitWall /*TODO: && another criteria: time, events qty, etc*/){
             collision = collisionPriorityQueue.peek();
             final double timeToCrash = collision.getTimeToCrash(); // TODO: chequear si es verdad que puede devolver null
+            collisionTimes.add(timeToCrash + totalTime); // TODO: chequear si es solo timeToCrash
 
             particleList.forEach(p -> p.evolve(timeToCrash)); // TODO: timeToCrash - timeSinceLastCollision ?
             timeSinceLastLog += timeToCrash;
@@ -32,6 +38,7 @@ public class Simulator {
             collisionPriorityQueue.forEach(c -> c.decreaseTimeToCrash(timeToCrash)); // all the other particles are now nearer to crash
 
             collision.crash();
+            totalCollisions++;
 
             p1 = collision.getFirstParticle();
             p2 = collision.getSecondParticle();
@@ -42,9 +49,16 @@ public class Simulator {
 
             if(timeSinceLastLog >= dt || bigParticleHitWall) { // it is the first event after having passed dt || it is the final state
                 logParticles(particleList);
+                totalTime += timeSinceLastLog; // the sum of times to crash
                 timeSinceLastLog = 0;
             }
         }
+
+        /* Exercise 3.1 */
+        System.out.println("Frecuencia de colisiones: " + totalCollisions / totalTime); // TODO: print to fileA instead
+        Collections.sort(collisionTimes); // ascending order
+        // TODO: print collision times to the same fileA
+
     }
 
     private static void logParticles(List<Particle> particleList) throws IOException {
@@ -53,6 +67,7 @@ public class Simulator {
 
 
     /*
+    * For exercise 3.3
     * The function does not simulate.
     * It initializes the simulation and calculates de kinetic energy of the system.
     * */

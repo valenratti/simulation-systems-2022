@@ -57,12 +57,13 @@ public class Main {
 
         simulationOptions.setVelocityMod(currentV);  // leaves it as it was
 
-        // TODO: print values to file instead
-        System.out.println(kineticEnergyList);
+        System.out.println(kineticEnergyList); // TODO: print to file instead
     }
 
     private static void ej4(SimulationOptions simulationOptions, Integer limit) throws IOException {
         // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
+        // TODO: pasarle el mismo file a cada simulacion
+
         Simulator.simulate(simulationOptions); // get info of 10 small particles
         for(int i=0; i < limit; i++)
             Simulator.simulate(simulationOptions); // get info of the big particle
