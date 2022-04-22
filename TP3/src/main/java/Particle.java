@@ -9,7 +9,7 @@ public class Particle {
     private double vx;
     private double vy;
     private double vModule;
-    private double mass;
+    private double mass; // kilos
     private boolean isBig;
 
     public Particle(double x, double y, double radius, double vx, double vy, double mass, boolean isBig) {
