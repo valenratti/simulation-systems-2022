@@ -22,7 +22,7 @@ public class SimulationOptions {
     private Double smallParticleRadius = 0.2;
 
     @Option(name = "-V", usage = "Velocity module.")
-    private Double velocityMod = 1.0;
+    private Double velocityMod = 2.0;
 
     @Option(name = "-DT", usage = "dt.")
     private Double dt = 0.05;

@@ -12,17 +12,17 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         final SimulationOptions simulationOptions = new SimulationOptions();
-        final List<Integer> NList = Arrays.asList(105, 125, 145); // 100 < N < 150
-        final List<Double> v0List = Arrays.asList(0.25, 0.5, 0.75, 1.25, 1.5, 1.75);
+        final List<Integer> NList = Arrays.asList(105, 120, 135); // 100 < N < 150
+        final List<Double> v0List = Arrays.asList(0.5, 1.0, 1.5);
         final Integer EJ4_ITERATIONS = 5; // number of iterations to calculate big particle's average
 
-        ej1(simulationOptions, NList);
+//        ej1(simulationOptions, NList);
 
         simulationOptions.setN(Collections.max(NList));
 
-        ej2(simulationOptions);
+//        ej2(simulationOptions);
 
-        ej3(simulationOptions, v0List);
+//        ej3(simulationOptions, v0List);
 
         ej4(simulationOptions, EJ4_ITERATIONS);
 
@@ -34,14 +34,14 @@ public class Main {
 
         for (Integer n : NList) {
             simulationOptions.setN(n);
-            Simulator.simulate(simulationOptions);
+            Simulator.simulate(simulationOptions, 1);
         }
 
         simulationOptions.setN(currentN);  // leaves as it was
     }
 
     private static void ej2(SimulationOptions simulationOptions) throws IOException {
-        Simulator.simulate(simulationOptions); // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
+        Simulator.simulate(simulationOptions, 2); // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
     }
 
     private static void ej3(SimulationOptions simulationOptions, List<Double> v0List) throws IOException {
@@ -51,8 +51,7 @@ public class Main {
 
         for (Double v : v0List) {
             simulationOptions.setVelocityMod(v);
-            ke = Simulator.getKineticEnergy(simulationOptions); //temperature
-            kineticEnergyList.add(new Pair(v, ke));
+            Simulator.simulate(simulationOptions,3);
         }
 
         simulationOptions.setVelocityMod(currentV);  // leaves it as it was
@@ -61,12 +60,8 @@ public class Main {
     }
 
     private static void ej4(SimulationOptions simulationOptions, Integer limit) throws IOException {
-        // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
-        // TODO: pasarle el mismo file a cada simulacion
-
-        Simulator.simulate(simulationOptions); // get info of 10 small particles
         for(int i=0; i < limit; i++)
-            Simulator.simulate(simulationOptions); // get info of the big particle
+            Simulator.simulate(simulationOptions, 4); // get info of the big particle
     }
 
 }
