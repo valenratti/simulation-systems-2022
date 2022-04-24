@@ -70,8 +70,10 @@ public class Collision implements Comparable<Collision>{
                 firstParticle.setVy(p1vy + j * dr[1] / (sigma * p1m));
                 secondParticle.setVx(p2vx - j * dr[0] / (sigma * p2m));
                 secondParticle.setVy(p2vy - j * dr[1] / (sigma * p2m));
+                secondParticle.updateVModule();
                 break;
         }
+        firstParticle.updateVModule();
     }
 
     public void decreaseTimeToCrash(double time) {

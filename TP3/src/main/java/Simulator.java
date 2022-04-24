@@ -1,7 +1,10 @@
 import simulation.SimulationOptions;
 import utils.Pair;
 
+import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -24,12 +27,18 @@ public class Simulator {
 
         double totalCollisions = 0, totalTime = 0; // for exercise 3.1
         Map<Integer, Integer> millisecondGroupedCollisions = new HashMap<>();
-        logParticles(particleList);  // log initial state
+        Map<BigDecimal, Integer> velocityGrouped = new HashMap<>();
 
-        List<Double> collisionTimes = new ArrayList<>();
-        List<Double> initialVelocities = particleList.stream().map(Particle::getvModule).collect(Collectors.toList());
+        logParticles(particleList, options.getN());  // log initial state
+
         if(ej.equals(2)){
-            FileWriter.generateVelocityFile("initialvelocities-ej3.2-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", initialVelocities);
+            Map<BigDecimal, List<Particle>> bigDecimalListMap = particleList.stream().collect(Collectors.groupingBy((p) -> {
+                return BigDecimal.valueOf(p.getvModule()).setScale(1, RoundingMode.HALF_EVEN);
+            }));
+            Map<BigDecimal, Double> doubleMap = new HashMap<>();
+            bigDecimalListMap.forEach((key, value) -> doubleMap.put(key, (double) value.size() / options.getN()));
+
+            FileWriter.generateVelocityFile("initialvelocities-ej3.2-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", doubleMap);
         }
 
         //BigParticle
@@ -41,15 +50,19 @@ public class Simulator {
         double bigParticleInitialY = bigParticle.getY();
 
         //DCM Little Particle
-        Particle analyzedLittleParticle = particleList.stream().filter((p) -> (p.getX() <= 1.0 && p.getY() <= 1.0)).findFirst()
-                .orElseThrow(RuntimeException::new);
-        double analyzedParticleInitialX = analyzedLittleParticle.getX();
-        double analyzedParticleInitialY = analyzedLittleParticle.getY();
-        List<Pair> littleParticleMSD = new ArrayList<>();
+        List<Particle> analyzedLittleParticles = particleList.stream()
+                .filter((p) -> (!p.isBig() && p.getX() >= 2.0 && p.getX() <= 4.0 && p.getY() >= 2.0 && p.getY() <= 4.0))
+                .limit(5).collect(Collectors.toList());
 
-        if(ej.equals(4)){
-            bigParticleMSD.add(new Pair(0.0, 0.0));
-            littleParticleMSD.add(new Pair(0.0, 0.0));
+        Map<Long, List<Pair>> littleParticlesMSD = new HashMap<>();
+        Map<Long, Pair> littleParticlesInitialPositions = new HashMap<>();
+        if(ej.equals(4)) {
+            analyzedLittleParticles.forEach((particle) -> {
+                List<Pair> newList = new ArrayList<>();
+                newList.add(new Pair(0.0, 0.0));
+                littleParticlesMSD.put(particle.getId(), newList);
+                littleParticlesInitialPositions.put(particle.getId(), new Pair(particle.getX(), particle.getY()));
+            });
         }
 
         //Kinetic energy
@@ -57,17 +70,16 @@ public class Simulator {
 
         while(!bigParticleHitWall && totalCollisions < options.getMaxCollisions()){
             collision = collisionPriorityQueue.peek();
-            final double timeToCrash = collision.getTimeToCrash(); // TODO: chequear si es verdad que puede devolver null
+            final double timeToCrash = collision.getTimeToCrash();
             final int timeToCrashMillisecondBin = (int) Math.floor(timeToCrash*1000);
 
-            collisionTimes.add(timeToCrash*1000);
             if(millisecondGroupedCollisions.containsKey(timeToCrashMillisecondBin)){
                 millisecondGroupedCollisions.put(timeToCrashMillisecondBin, millisecondGroupedCollisions.get(timeToCrashMillisecondBin)+1);
             }else{
                 millisecondGroupedCollisions.put(timeToCrashMillisecondBin, 1);
             }
 
-            particleList.forEach(p -> p.evolve(timeToCrash)); // TODO: timeToCrash - timeSinceLastCollision ?
+            particleList.forEach(p -> p.evolve(timeToCrash));
             timeSinceLastLog += timeToCrash;
 
             collisionPriorityQueue.remove();
@@ -82,21 +94,37 @@ public class Simulator {
             CollisionCalculator.calculateCollisionsForAParticle(collisionPriorityQueue, particleList, areaLength, p2);
 
             bigParticleHitWall = p1.isBig() && p2 == null; // p2 == null <==> p2 is a wall
-            littleParticleHitWall = p1.equals(analyzedLittleParticle) && p2 == null;
+
+
+//            littleParticleHitWall = p1.getId() == analyzedLittleParticle.getId() && p2 == null;
 
             if(timeSinceLastLog >= dt || bigParticleHitWall) { // it is the first event after having passed dt || it is the final state
                 totalTime += timeSinceLastLog; // the sum of times to crash
                 if(ej.equals(3)) {
                     bigParticlePositions.add(new Pair(bigParticle.getX(), bigParticle.getY()));
                 }else if(ej.equals(2)) {
-                    FileWriter.generateVelocitiesFileDuringSimulation("smallparticlesvelocities-ej3.2-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", particleList);
-                }else if(ej.equals(4)){
-                    bigParticleMSD.add(new Pair(totalTime, calculateMeanSquaredDisplacement(bigParticle, bigParticleInitialX, bigParticleInitialY)));
-                    if(!littleParticleHitWall) {
-                        littleParticleMSD.add(new Pair(totalTime, calculateMeanSquaredDisplacement(analyzedLittleParticle, analyzedParticleInitialX, analyzedParticleInitialY)));
+                    if(totalTime >= 40.0) {
+                        Map<BigDecimal, List<Particle>> bigDecimalListMap = particleList.stream().collect(Collectors.groupingBy((p) -> {
+                            return BigDecimal.valueOf(p.getvModule()).setScale(1, RoundingMode.HALF_EVEN);
+                        }));
+                        bigDecimalListMap.forEach((key, value) -> velocityGrouped.put(key, value.size()));
                     }
+                }else if(ej.equals(4)) {
+                    if(p2 == null) {
+                        Particle finalP1 = p1;
+                        analyzedLittleParticles.stream().filter((p) -> finalP1.getId() == p.getId())
+                                .collect(Collectors.toList()).forEach(analyzedLittleParticles::remove);
+                    }
+
+                    double finalTotalTime = totalTime;
+                    analyzedLittleParticles.forEach((particle) -> {
+                        littleParticlesMSD.get(particle.getId())
+                                .add(new Pair(finalTotalTime, calculateMeanSquaredDisplacement(particle, littleParticlesInitialPositions.get(particle.getId()).getX(), littleParticlesInitialPositions.get(particle.getId()).getY())));
+                    });
+                    bigParticleMSD.add(new Pair(totalTime, calculateMeanSquaredDisplacement(bigParticle, bigParticleInitialX, bigParticleInitialY)));
+
                 }
-                logParticles(particleList);
+                logParticles(particleList, options.getN());
                 timeSinceLastLog = 0;
             }
         }
@@ -106,22 +134,31 @@ public class Simulator {
                         +  "\nTime of the simulation: "  + totalTime));
 
         Map<Integer, Double> binProbability = new HashMap<>();
+
         if(ej.equals(1)) {
             double finalTotalCollisions = totalCollisions;
             millisecondGroupedCollisions.forEach((key, value) -> binProbability.put(key, (double) value / finalTotalCollisions));
             FileWriter.generateCollisionTimesFile("collisiontimes-ej3.1-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", binProbability);
             FileWriter.generateFrecuencyCollisionsTimeFile("collisionfreq-ej3.1-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", totalCollisions / totalTime);
+        }else if(ej.equals(2)){
+            Map<BigDecimal, Double> doubleMap = new HashMap<>();
+            int totalSize = velocityGrouped.values().stream().mapToInt((value) -> value).sum();
+            velocityGrouped.forEach((key,value) -> doubleMap.put(key, (double) value / totalSize));
+            FileWriter.generateVelocityFile("smallparticlesvelocities-ej3.2-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", doubleMap);
         }
         else if(ej.equals(3)){
             FileWriter.generateBigParticlePositionFile("bigparticlepositions-ej3.3-" + LocalDateTime.now() + "-ke-" + ke + ".csv", bigParticlePositions);
         } else if(ej.equals(4)){
-            FileWriter.generateParticleMSD("bigparticlemsd-ej3.4-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", bigParticleMSD);
-            FileWriter.generateParticleMSD("littleparticlemsd-ej3.4-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", littleParticleMSD);
+//            FileWriter.generateParticleMSD("bigparticlemsd-ej3.4-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", bigParticleMSD);
+            littleParticlesMSD.forEach((key, value) -> FileWriter.generateParticleMSD("littleparticlemsd-ej3.4-" + LocalDateTime.now() + "-n-" + options.getN() + ".csv", value));
+
         }
+
+        FileWriter.reset();
     }
 
-    private static void logParticles(List<Particle> particleList) throws IOException {
-        FileWriter.printToFile(particleList);
+    private static void logParticles(List<Particle> particleList, int n) throws IOException {
+        FileWriter.printToFile(particleList, n);
     }
 
 

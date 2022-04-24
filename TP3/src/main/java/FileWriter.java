@@ -2,21 +2,26 @@ import utils.Pair;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FileWriter {
 
     private static BufferedWriter simulationBufferedWriter;
     private static BufferedWriter velocityBufferedWriter;
 
-    private static BufferedWriter bigParticleMSDBufferedWriter;
-    private static BufferedWriter smallParticleMSDBufferedWriter;
-    private final static String SIMULATION_FILENAME = "positions.xyz";
+    public static void reset(){
+        simulationBufferedWriter = null;
+        velocityBufferedWriter = null;
+    }
 
-    public static void generateXYZFile(){
+    public static void generateXYZFile(int n){
         try{
-            java.io.FileWriter fileWriter = new java.io.FileWriter(SIMULATION_FILENAME);
+            java.io.FileWriter fileWriter = new java.io.FileWriter("positions-" + LocalDateTime.now()+ "-n-" + n + ".csv");
             simulationBufferedWriter = new BufferedWriter(fileWriter);
         }catch(IOException e){
             System.out.println(e);
@@ -32,9 +37,9 @@ public class FileWriter {
         }
     }
 
-    public static void printToFile(List<Particle> particles) throws IOException {
+    public static void printToFile(List<Particle> particles, int n) throws IOException {
         if(simulationBufferedWriter == null){
-            generateXYZFile();
+            generateXYZFile(n);
         }
 
         simulationBufferedWriter.write(String.valueOf(particles.size()));
@@ -88,7 +93,7 @@ public class FileWriter {
         statisticsBuffererWriter.write("interval, probability");
         statisticsBuffererWriter.newLine();
         collisionTimes.forEach((bin, value) -> {try{
-            statisticsBuffererWriter.write(bin + "-" + bin+1 + "," + String.valueOf(value));
+            statisticsBuffererWriter.write(bin + "-" + (bin+1) + "," + String.valueOf(value));
             statisticsBuffererWriter.newLine();
         }catch (IOException e){
             System.out.println(e);
@@ -96,17 +101,19 @@ public class FileWriter {
         statisticsBuffererWriter.flush();
     }
 
-    public static void generateVelocityFile(String filename, List<Double> velocities) throws IOException {
+    public static void generateVelocityFile(String filename, Map<BigDecimal, Double> velocities) throws IOException {
         java.io.FileWriter statisticsFileWriter = new java.io.FileWriter(filename);
         BufferedWriter statisticsBuffererWriter = new BufferedWriter(statisticsFileWriter);
-        statisticsBuffererWriter.write("velocities");
+        statisticsBuffererWriter.write("interval");
         statisticsBuffererWriter.newLine();
-        velocities.forEach(velocity -> {try{
-            statisticsBuffererWriter.write(String.valueOf(velocity));
-            statisticsBuffererWriter.newLine();
-        }catch (IOException e){
-            System.out.println(e);
-        }});
+        for(BigDecimal key : velocities.keySet().stream().sorted().collect(Collectors.toList()) ) {
+            try{
+                statisticsBuffererWriter.write(key + "-" + (key.add(BigDecimal.valueOf(0.1)) + "," + velocities.get(key)));
+                statisticsBuffererWriter.newLine();
+            }catch (IOException e){
+                System.out.println(e);
+            }
+        };
         statisticsBuffererWriter.flush();
     }
 

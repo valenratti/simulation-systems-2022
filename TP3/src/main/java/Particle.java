@@ -133,6 +133,9 @@ public class Particle {
                 <= Math.pow(radius + particle.getRadius(), 2);
     }
 
+    public void updateVModule() {
+        this.vModule = Math.hypot(vx, vy);
+    }
 
     public void evolve(double time) {
         x = x + vx * time;

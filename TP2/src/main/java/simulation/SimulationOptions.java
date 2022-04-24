@@ -9,7 +9,7 @@ import java.io.File;
 
 public class SimulationOptions {
 
-    @Option(name = "-N", usage = "Initial alive cells.", forbids={"-F"}) /*TODO: alive cells?*/
+    @Option(name = "-N", usage = "Initial alive cells.", forbids={"-F"})
     private Integer n = 1000;
 
     @Option(name = "-D", usage = "Grid dimension.")

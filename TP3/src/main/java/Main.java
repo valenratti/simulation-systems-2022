@@ -16,17 +16,16 @@ public class Main {
         final List<Double> v0List = Arrays.asList(0.5, 1.0, 1.5);
         final Integer EJ4_ITERATIONS = 5; // number of iterations to calculate big particle's average
 
-//        ej1(simulationOptions, NList);
+        ej1(simulationOptions, NList);
 
         simulationOptions.setN(Collections.max(NList));
 
-//        ej2(simulationOptions);
+        ej2(simulationOptions);
 
-//        ej3(simulationOptions, v0List);
+        ej3(simulationOptions, v0List);
 
         ej4(simulationOptions, EJ4_ITERATIONS);
 
-        // TODO: Ver si conviene unificar algunos ejs
     }
 
     private static void ej1(SimulationOptions simulationOptions, List<Integer> NList) throws IOException {
@@ -41,7 +40,7 @@ public class Main {
     }
 
     private static void ej2(SimulationOptions simulationOptions) throws IOException {
-        Simulator.simulate(simulationOptions, 2); // TODO: ver si creamos otro metodo en Simulator, o si conviene agregar cosas al que ya tenemos
+        Simulator.simulate(simulationOptions, 2);
     }
 
     private static void ej3(SimulationOptions simulationOptions, List<Double> v0List) throws IOException {
@@ -56,12 +55,11 @@ public class Main {
 
         simulationOptions.setVelocityMod(currentV);  // leaves it as it was
 
-        System.out.println(kineticEnergyList); // TODO: print to file instead
+        System.out.println(kineticEnergyList);
     }
 
     private static void ej4(SimulationOptions simulationOptions, Integer limit) throws IOException {
-        for(int i=0; i < limit; i++)
-            Simulator.simulate(simulationOptions, 4); // get info of the big particle
+        Simulator.simulate(simulationOptions, 4); // get info of the big particle
     }
 
 }
