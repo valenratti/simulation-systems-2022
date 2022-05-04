@@ -1,3 +1,5 @@
+package model;
+
 public class Particle {
     private static Long currentId = 0L;
 
