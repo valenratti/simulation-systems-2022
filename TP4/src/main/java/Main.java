@@ -19,9 +19,14 @@ public class Main {
         // Condiciones iniciales
         final int r0 = 1;                   // r(t=0) = 1 m
         final double v0 = -A * gamma / 2;  // v(t=0) = -A*gamma/(2m) m/s
+
+        final double dt = 0.0001;
+        final double dt2 = dt*1000;
+
+        Simulator.simulateSystem1(dt, dt2);
     }
 
     private static void ej2() throws IOException {
-
+        Simulator.simulateSystem2();
     }
 }
