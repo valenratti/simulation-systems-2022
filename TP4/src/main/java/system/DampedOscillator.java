@@ -1,6 +1,7 @@
 package system;
 
 import model.Particle;
+import utils.Pair;
 
 public class DampedOscillator implements System {
     private final double K, GAMMA, A;
@@ -12,17 +13,20 @@ public class DampedOscillator implements System {
     }
 
     @Override
-    public double force(Particle particle) {
+    public Pair force(Particle particle) {
         // f = m*a = m*r2 = -k*r - gamma*r1
-        return -K * particle.getX() - GAMMA * particle.getVx(); // no hay 'y' en este sistema
+        final double x = -K * particle.getX() - GAMMA * particle.getVx();
+
+        return new Pair(x, 0);  // no hay fuerza en 'y' en este sistema
     }
 
     @Override
-    public double analyticalSolution(Particle particle, double t) {
+    public Pair analyticalSolution(Particle particle, double t) {
         final double m = particle.getMass();
-
-        return A * Math.exp(-GAMMA / (2 * m) * t) *
+        final double x = A * Math.exp(-GAMMA / (2 * m) * t) *
                 Math.cos(Math.sqrt(K / m - Math.pow(GAMMA, 2) / (4 * Math.pow(m, 2))) * t);
+
+        return new Pair(x, 0);
     }
 
 }

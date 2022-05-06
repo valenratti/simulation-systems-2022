@@ -1,8 +1,9 @@
 package system;
 
 import model.Particle;
+import utils.Pair;
 
 public interface System {
-    double force(Particle particle);
-    double analyticalSolution(Particle particle, double t);
+    Pair force(Particle particle);
+    Pair analyticalSolution(Particle particle, double t);
 }

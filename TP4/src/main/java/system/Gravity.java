@@ -1,15 +1,16 @@
 package system;
 
 import model.Particle;
+import utils.Pair;
 
 public class Gravity implements System {
     @Override
-    public double force(Particle particle) {
-        return 0; // TODO
+    public Pair force(Particle particle) {
+        return new Pair(0, 0); // TODO
     }
 
     @Override
-    public double analyticalSolution(Particle particle, double t) {
-        return 0; // TODO
+    public Pair analyticalSolution(Particle particle, double t) {
+        return new Pair(0, 0); // TODO
     }
 }
