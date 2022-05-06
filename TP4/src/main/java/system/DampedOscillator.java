@@ -2,7 +2,7 @@ package system;
 
 import model.Particle;
 
-public class DampedOscillator {
+public class DampedOscillator implements System {
     private final double K, GAMMA, A;
 
     public DampedOscillator(double k, double gamma, double a) {
@@ -11,11 +11,13 @@ public class DampedOscillator {
         this.A = a;
     }
 
+    @Override
     public double force(Particle particle) {
         // f = m*a = m*r2 = -k*r - gamma*r1
         return -K * particle.getX() - GAMMA * particle.getVx(); // no hay 'y' en este sistema
     }
 
+    @Override
     public double analyticalSolution(Particle particle, double t) {
         final double m = particle.getMass();
 
