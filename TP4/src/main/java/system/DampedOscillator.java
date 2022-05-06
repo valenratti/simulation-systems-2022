@@ -29,4 +29,9 @@ public class DampedOscillator implements System {
         return new Pair(x, 0);
     }
 
+    @Override
+    public boolean isForceVelocityDependent() {
+        return true;
+    }
+
 }

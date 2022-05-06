@@ -12,8 +12,8 @@ public class Particle {
     private double mass;
     private double charge;
 
-    public Particle(double x, double y, double vx, double vy, double mass, double charge) {
-        this.id = currentId++;
+    public Particle(double x, double y, double vx, double vy, double mass, double charge, boolean idDisposable) {
+        this.id = idDisposable ? null : currentId++;
         this.x = x;
         this.y = y;
         // no radius // TODO: check
@@ -77,5 +77,12 @@ public class Particle {
 
     public void setCharge(double charge) {
         this.charge = charge;
+    }
+
+    public void updateState(double x, double y, double vx, double vy) {
+        setX(x);
+        setY(y);
+        setVx(vx);
+        setVy(vy);
     }
 }

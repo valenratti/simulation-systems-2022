@@ -13,4 +13,9 @@ public class Gravity implements System {
     public Pair analyticalSolution(Particle particle, double t) {
         return new Pair(0, 0); // TODO
     }
+
+    @Override
+    public boolean isForceVelocityDependent() {
+        return false; // FIXME: check
+    }
 }
