@@ -1,7 +1,7 @@
 package integrator;
 
 import model.Particle;
-import system.System;
+import system.oscilator.System;
 
 // order 5
 public class GearPredictorCorrector implements Integrator {

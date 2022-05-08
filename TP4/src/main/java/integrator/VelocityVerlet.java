@@ -1,7 +1,7 @@
 package integrator;
 
 import model.Particle;
-import system.System;
+import system.oscilator.System;
 
 public class VelocityVerlet implements Integrator {
     private double dt;

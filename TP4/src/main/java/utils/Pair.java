@@ -27,6 +27,18 @@ public class Pair {
         this.y = y;
     }
 
+    public Pair add(Pair pair){
+        this.x = pair.getX();
+        this.y = pair.getY();
+        return this;
+    }
+
+    public Pair multiplyBy(double value){
+        this.x = this.x * value;
+        this.y = this.y * value;
+        return this;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

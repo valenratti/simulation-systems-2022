@@ -1,5 +1,7 @@
 package model;
 
+import java.util.List;
+
 public class Particle {
     private static Long currentId = 0L;
 
@@ -11,6 +13,9 @@ public class Particle {
     private double vy;
     private double mass;
     private double charge;
+    private static final double k = 1e10;
+    private double ax; //acceleration x
+    private double ay; //acceleration y
 
     public Particle(double x, double y, double vx, double vy, double mass, double charge, boolean idDisposable) {
         this.id = idDisposable ? null : currentId++;
@@ -21,6 +26,8 @@ public class Particle {
         this.vy = vy;
         this.mass = mass;
         this.charge = charge;
+        this.ax = 0;
+        this.ay = 0;
     }
 
     public Long getId() {
@@ -84,5 +91,39 @@ public class Particle {
         setY(y);
         setVx(vx);
         setVy(vy);
+    }
+
+    public double getKineticEnergy() {
+        return 0.5 * this.mass * Math.pow( Math.abs( getVModule() ), 2 );
+    }
+
+    public double getElectrostaticPotentialEnergy( List<Particle> particles ) {
+        double energy = 0;
+        for(Particle particle : particles) {
+            double distance = Math.hypot( this.x - particle.getX(), this.y - particle.getY() );
+            energy += particle.charge / distance;
+        }
+        energy *= this.charge * Particle.k;
+        return energy;
+    }
+
+    public double getTotalEnergy(List<Particle> particles) {
+        return this.getKineticEnergy() + this.getElectrostaticPotentialEnergy( particles );
+    }
+
+    public double getAx() {
+        return ax;
+    }
+
+    public void setAx(double ax) {
+        this.ax = ax;
+    }
+
+    public double getAy() {
+        return ay;
+    }
+
+    public void setAy(double ay) {
+        this.ay = ay;
     }
 }

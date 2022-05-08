@@ -2,7 +2,7 @@ import integrator.Beeman;
 import integrator.GearPredictorCorrector;
 import integrator.VelocityVerlet;
 import model.Particle;
-import system.DampedOscillator;
+import system.oscilator.DampedOscillator;
 
 import java.io.IOException;
 

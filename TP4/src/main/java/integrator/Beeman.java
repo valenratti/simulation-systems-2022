@@ -1,7 +1,7 @@
 package integrator;
 
 import model.Particle;
-import system.System;
+import system.oscilator.System;
 import utils.Pair;
 
 public class Beeman implements Integrator {

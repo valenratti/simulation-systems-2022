@@ -1,4 +1,4 @@
-package system;
+package system.oscilator;
 
 import model.Particle;
 import utils.Pair;
