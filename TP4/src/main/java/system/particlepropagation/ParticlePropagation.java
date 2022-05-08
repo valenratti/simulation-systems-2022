@@ -1,9 +1,11 @@
 package system.particlepropagation;
 
 import model.Particle;
+import utils.FileWriter;
 import utils.Pair;
 import utils.RandomUtils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,6 +22,7 @@ public class ParticlePropagation {
     private double time;
     private final double initialTotalEnergy;
     private boolean closenessReached;
+    private static int i=0;
 
     //Simulation information
     private final List<Pair> particlePositions;
@@ -32,8 +35,9 @@ public class ParticlePropagation {
         this.dt = dt;
         this.l = d * ( N - 1);
         this.time = 0;
-        double initialY = RandomUtils.randDouble((l/2) + d, (l/2) - d);
+        double initialY = RandomUtils.randDouble((l/2) - d, (l/2) + d);
         movingParticle = new Particle(-d, initialY, initialVx, initialVy, mass, this.Q, false);
+        crystalParticles = new ArrayList<>();
         for(int i=0; i<N; i++){
             for(int j=0; j<N; j++){
                 boolean isPositiveCharge = ( i + j ) % 2 == 0;
@@ -47,10 +51,14 @@ public class ParticlePropagation {
         this.deltaEnergyThroughTime = new ArrayList<>();
     }
 
-    public State simulate(boolean writeResults){
+    public State simulate(boolean writeResults) throws IOException {
         State currentState = State.UNFINISHED;
         while(currentState.equals(State.UNFINISHED)){
             currentState = getNextState();
+        }
+
+        if(writeResults){
+            FileWriter.printParticlePropagation(this);
         }
 
         return currentState;
@@ -150,6 +158,19 @@ public class ParticlePropagation {
     }
 
 
+    public List<Particle> getCrystalParticles() {
+        return crystalParticles;
+    }
 
+    public Particle getMovingParticle() {
+        return movingParticle;
+    }
 
+    public List<Pair> getParticlePositions() {
+        return particlePositions;
+    }
+
+    public List<Double> getDeltaEnergyThroughTime() {
+        return deltaEnergyThroughTime;
+    }
 }

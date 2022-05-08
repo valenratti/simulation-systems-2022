@@ -3,8 +3,12 @@ import integrator.GearPredictorCorrector;
 import integrator.VelocityVerlet;
 import model.Particle;
 import system.oscilator.DampedOscillator;
+import system.particlepropagation.ParticlePropagation;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class Simulator {
     public static void simulateSystem1(double m, int k, int gamma, double A, double tf, double r0, double v0, double dt, double dt2) {
@@ -51,5 +55,33 @@ public class Simulator {
     }
 
     public static void simulateSystem2() throws IOException {
+        ParticlePropagation particlePropagation = new ParticlePropagation(1e-8, 1e-13, 1e+3, 0, 1e-27);
+        particlePropagation.simulate(true);
+    }
+
+    public static void ej2_1() throws IOException {
+        List<Double> dtList = Arrays.asList(1e-15, 1e-16, 1e-17);
+        List<List<Double>> energyLists = new ArrayList<>();
+        for(double currentDt : dtList){
+            ParticlePropagation particlePropagation = new ParticlePropagation(1e-8, currentDt, 5e+4, 0, 1e-27);
+            particlePropagation.simulate(false);
+            energyLists.add(particlePropagation.getDeltaEnergyThroughTime());
+        }
+
+        //Calculate average...
+    }
+
+    public static void ej2_2(){
+        int samplesQty = 30;
+        double[] velocitiesArray = new double[]{50, 100, 150, 200, 250, 300, 350, 400, 450, 500};
+        double velocityMultiplier = 1e+2;
+        for(double v : velocitiesArray){
+            double velocityX = v*velocityMultiplier;
+            for(int i=0; i<samplesQty; i++){
+
+            }
+        }
+
+
     }
 }
