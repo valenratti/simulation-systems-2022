@@ -3,7 +3,7 @@ package system.particlepropagation;
 import model.Particle;
 import utils.FileWriter;
 import utils.Pair;
-import utils.RandomUtils;
+import utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class ParticlePropagation {
         this.dt = dt;
         this.l = d * ( N - 1);
         this.time = 0;
-        double initialY = RandomUtils.randDouble((l/2) - d, (l/2) + d);
+        double initialY = Utils.randDouble((l/2) - d, (l/2) + d);
         movingParticle = new Particle(-d, initialY, initialVx, initialVy, mass, this.Q, false);
         crystalParticles = new ArrayList<>();
         for(int i=0; i<N; i++){
