@@ -6,7 +6,23 @@ import utils.Pair;
 public class Gravity implements System {
     @Override
     public Pair force(Particle particle) {
-        return new Pair(0, 0); // TODO
+        // TODO
+        return new Pair(0, 0);
+    }
+
+    public Pair forceD1(Particle particle) {
+        // TODO
+        return new Pair(0, 0);
+    }
+
+    public Pair forceD2(Particle particle) {
+        // TODO
+        return new Pair(0, 0);
+    }
+
+    public Pair forceD3(Particle particle) {
+        // TODO
+        return new Pair(0, 0);
     }
 
     @Override
