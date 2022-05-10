@@ -4,11 +4,12 @@ import integrator.VelocityVerlet;
 import model.Particle;
 import system.oscilator.DampedOscillator;
 import system.particlepropagation.ParticlePropagation;
+import system.particlepropagation.State;
+import utils.FileWriter;
+import utils.Utils;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Simulator {
     public static void simulateSystem1(double m, int k, int gamma, double A, double tf, double r0, double v0, double dt, double dt2) {
@@ -36,7 +37,7 @@ public class Simulator {
 
         // TODO: log initial state ?
 
-        while(time < tf) {
+        while (time < tf) {
             dampedOscillator.analyticalSolution(p1, time);
             beeman.nextStep(p2);
             velocityVerlet.nextStep(p3);
@@ -47,7 +48,7 @@ public class Simulator {
             time += dt; // FIXME: antes o despues de evolucionar?
             aux++;
 
-            if(aux == logStep) {
+            if (aux == logStep) {
                 // TODO: log state
                 aux = 0;
             }
@@ -60,28 +61,90 @@ public class Simulator {
     }
 
     public static void ej2_1() throws IOException {
-        List<Double> dtList = Arrays.asList(1e-15, 1e-16, 1e-17);
-        List<List<Double>> energyLists = new ArrayList<>();
-        for(double currentDt : dtList){
-            ParticlePropagation particlePropagation = new ParticlePropagation(1e-8, currentDt, 5e+4, 0, 1e-27);
-            particlePropagation.simulate(false);
-            energyLists.add(particlePropagation.getDeltaEnergyThroughTime());
+        List<Double> dtList = Arrays.asList(1e-13, 1e-14, 1e-15, 1e-16, 1e-17);
+//        double initialY = Utils.randDouble((l/2) - d, (l/2) + d);
+        double d = 1e-8;
+        double l = d * 15;
+        double initialY = (l / 2) - d;
+        double yVariation = 2 * d / 5;
+        List<Double> initialYList = Arrays.asList(initialY, initialY + yVariation, initialY + 2 * yVariation, initialY
+                + 3 * yVariation, initialY + 4 * yVariation);
+        for (double currentDt : dtList) {
+            List<List<Double>> energyLists = new ArrayList<>();
+            Map<Double, Double> dtEnergyMap = new HashMap<>();
+            for (double y : initialYList) {
+                ParticlePropagation particlePropagation = new ParticlePropagation(d, currentDt, 5e+4, 0, 1e-27, y);
+                particlePropagation.simulate(false);
+                energyLists.add(particlePropagation.getDeltaEnergyThroughTime());
+            }
+
+            int maxSize = energyLists.stream().max(Comparator.comparing(List::size)).get().size();
+            for (int i = 1; i < maxSize + 1; i++) {
+                int qty = 0;
+                double value = 0;
+                for (List<Double> currentList : energyLists) {
+                    try {
+                        value += currentList.get(i - 1);
+                        qty++;
+                    } catch (IndexOutOfBoundsException e) {
+                        //do nothing.
+                    }
+                }
+                dtEnergyMap.put(i * currentDt, value / qty);
+            }
+            FileWriter.printEnergyDiffVsTime(dtEnergyMap, currentDt);
         }
 
         //Calculate average...
     }
 
-    public static void ej2_2(){
+    public static void ej2_2() throws IOException {
         int samplesQty = 30;
-        double[] velocitiesArray = new double[]{50, 100, 150, 200, 250, 300, 350, 400, 450, 500};
+        double[] velocitiesArray = new double[]{50, 150, 250, 350, 450};
         double velocityMultiplier = 1e+2;
-        for(double v : velocitiesArray){
-            double velocityX = v*velocityMultiplier;
-            for(int i=0; i<samplesQty; i++){
-
+        double d = 1e-8;
+        double dt = 1e-15;
+        Map<Double, Map<State,Integer>> endStateResults = new HashMap<>();
+        for (double v : velocitiesArray) {
+            Map<State, Integer> endStateCount = new HashMap<>();
+            List<List<Double>> particleTrajectoryList = new ArrayList<>();
+            double velocityX = v * velocityMultiplier;
+            for (int i = 0; i < samplesQty; i++) {
+                ParticlePropagation particlePropagation = new ParticlePropagation(d, dt, velocityX, 0.0, 1e-27);
+                //Only save last sample
+                State endState = particlePropagation.simulate(i == samplesQty - 1);
+                endStateCount.put(endState, endStateCount.get(endState) + 1);
+                particleTrajectoryList.add(particlePropagation.calculateParticleTrajectory());
             }
+            endStateResults.put(velocityX, endStateCount);
+
+            List<Double> avgLengths = new LinkedList<>();
+            List<Double> stdLengths = new LinkedList<>();
+            int maxSize = particleTrajectoryList.stream()
+                    .map(List::size)
+                    .max(Comparator.naturalOrder())
+                    .get();
+            for (int i = 0; i < maxSize; i++) {
+                List<Double> valuesAtI = new LinkedList<>();
+                for (List<Double> lengths : particleTrajectoryList) {
+                    if (lengths.size() > i) {
+                        valuesAtI.add(lengths.get(i));
+                    }
+                }
+                Double avg = valuesAtI.stream()
+                        .reduce((x, y) -> x + y)
+                        .get() / valuesAtI.size();
+
+                Double std = Math.sqrt(valuesAtI.stream()
+                        .map(val -> Math.pow(val - avg, 2))
+                        .reduce((v1, v2) -> v1 + v2)
+                        .get() / valuesAtI.size());
+
+                avgLengths.add(avg);
+                stdLengths.add(std);
+            }
+            FileWriter.printParticleLengthTrajectory(avgLengths, stdLengths, dt, velocityX);
+            FileWriter.reset();
         }
-
-
     }
 }
