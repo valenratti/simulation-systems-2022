@@ -22,21 +22,23 @@ public class DampedOscillator implements System {
 
     public Pair forceD1(Particle particle) {
         // f' = m*r3 = -k*r1 - gamma*r2
-        final double x = -K * particle.getVx() - GAMMA * force(particle).getX();
+        final double x = -K * particle.getVx() - GAMMA * force(particle).getX() / particle.getMass();
 
         return new Pair(x, 0);
     }
 
     public Pair forceD2(Particle particle) {
         // f'' = m*r4 = -k*r2 - gamma*r3
-        final double x = -K * force(particle).getX() - GAMMA * forceD1(particle).getX();
+        final double m = particle.getMass();
+        final double x = -K * force(particle).getX() / m - GAMMA * forceD1(particle).getX() / m;
 
         return new Pair(x, 0);
     }
 
     public Pair forceD3(Particle particle) {
         // f''' = m*r5 = -k*r3 - gamma*r4
-        final double x = -K * forceD1(particle).getX() - GAMMA * forceD2(particle).getX();
+        final double m = particle.getMass();
+        final double x = -K * forceD1(particle).getX() / m - GAMMA * forceD2(particle).getX() / m;
 
         return new Pair(x, 0);
     }

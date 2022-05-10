@@ -12,11 +12,11 @@ public class Main {
         final double m = 70;                    // m = 70 kg
         final int k = (int) Math.pow(10, 4);    // k = 10^4 N/m
         final int gamma = 100;                  // gamma = 100 kg/s
-        final double A = 1.0;                   // amplitud // TODO: ver que amplitud usar
+        final double A = 1.0;                   // amplitud = r0
         final double tf = 5;                    // tf = 5 s
 
         // Condiciones iniciales
-        final double r0 = 1;               // r(t=0) = 1 m
+        final double r0 = 1;               // r(t=0) = 1 m ==> A = 1 m
         final double v0 = -A * gamma / 2;  // v(t=0) = -A*gamma/(2m) m/s
 
         final double dt = 0.0001;
