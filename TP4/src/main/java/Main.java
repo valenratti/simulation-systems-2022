@@ -30,7 +30,7 @@ public class Main {
         final boolean ANALYSING_BEST_DT = false;     // in order not to comment/uncomment parts of the code
 
         if(ANALYSING_BEST_DT) {
-            List<Double> dtList = new ArrayList<>(Arrays.asList(0.05, 0.01, 5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5));
+            List<Double> dtList = new ArrayList<>(Arrays.asList(0.01, 5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5));
 
             List<Double> auxList, dtMseList;
             List<List<Double>> dtMseListList = new ArrayList<>();
@@ -38,7 +38,7 @@ public class Main {
             System.out.println("dt,\tbeeman,\tverlet,\tgpc");
 
             for (double dt : dtList) {
-                auxList = (Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, dt, tf)); // dt2 = tf because we don't care to log the positions right now
+                auxList = (Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, dt, 1e-3));
                 dtMseList = new ArrayList<>(auxList);
                 dtMseListList.add(dtMseList);
                 System.out.println(Utils.fromDoubleListToCsvLine(dt, dtMseList, "%.3e"));
@@ -48,9 +48,10 @@ public class Main {
         }
         else {
             final double best_dt = 1e-4;
-            final double dt2 = best_dt * 1000;
+            final double dt2 = best_dt * 100;
 
-            Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, best_dt, dt2);
+            List<Double> mseList = Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, best_dt, dt2);
+            System.out.println(Utils.fromDoubleListToCsvLine(best_dt, mseList, "%.3e"));
         }
     }
 

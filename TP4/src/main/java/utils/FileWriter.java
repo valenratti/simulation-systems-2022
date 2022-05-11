@@ -91,7 +91,7 @@ public class FileWriter {
         bw.newLine();
 
         for(int i = 0; i < dtList.size(); i++){
-            bw.write(Utils.fromDoubleListToCsvLine(dtList.get(i), values.get(i), "%.3e"));
+            bw.write(Utils.fromDoubleListToCsvLine(dtList.get(i), values.get(i), null /* o sino: "%.3e" */));
             bw.newLine();
         }
 
@@ -116,7 +116,7 @@ public class FileWriter {
             ps.println("t,beeman,verlet,gpc,analytical_solution");
         }
 
-        ps.println(Utils.fromDoubleListToCsvLine(time, positions, "%.3e"));
+        ps.println(Utils.fromDoubleListToCsvLine(time, positions, null /* o sino: "%.3e" */));
 
         ps.close();
     }

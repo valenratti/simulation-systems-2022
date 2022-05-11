@@ -32,10 +32,14 @@ public class Utils {
         StringBuilder ans = new StringBuilder();
 
         if(firstColumn != null)
-            ans.append(String.format("%.1e", firstColumn)).append(",");
+            ans.append(format == null ? firstColumn : String.format("%.1e", firstColumn)).append(",");
 
-        for(Double s : list)
-            ans.append(String.format(format, s)).append(",");
+        if(format != null)
+            for(Double s : list)
+                ans.append(String.format(format, s)).append(",");
+        else
+            for(Double s : list)
+                ans.append(s).append(",");
 
         return ans.deleteCharAt(ans.length()-1).toString(); // removes extra comma before returning
     }
