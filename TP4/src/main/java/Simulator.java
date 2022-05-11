@@ -1,9 +1,10 @@
 import integrator.Beeman;
 import integrator.GearPredictorCorrector;
-import integrator.VelocityVerlet;
+import integrator.Verlet;
 import model.Particle;
 import system.oscilator.DampedOscillator;
 import system.particlepropagation.ParticlePropagation;
+import utils.Utils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -15,9 +16,9 @@ public class Simulator {
         // time unit --> seconds
 
         double time = 0.0;
-        int aux = 0;
+        int aux = 0;    // aux = (time % dt2) / dt  <--> aux * dt = time + k * dt2
 
-        final double logStep = dt2 / dt;
+        final double logStep = dt2 / dt;    // dt2 = logStep * dt
 
         final Particle p1 = new Particle(r0, 0, v0, 0, m, 0, false);
         final Particle p2 = new Particle(r0, 0, v0, 0, m, 0, false);
@@ -26,32 +27,52 @@ public class Simulator {
 
         final DampedOscillator dampedOscillator = new DampedOscillator(k, gamma, A);
 
-        final Beeman beeman = new Beeman(dt, dampedOscillator);
-        final VelocityVerlet velocityVerlet = new VelocityVerlet(dt, dampedOscillator);
-        final GearPredictorCorrector gearPredictorCorrector = new GearPredictorCorrector(dt, dampedOscillator);
+        final Beeman beeman = new Beeman(dt, dampedOscillator); // 1
+        final Verlet verlet = new Verlet(dt, dampedOscillator);    // 2
+        final GearPredictorCorrector gearPredictorCorrector = new GearPredictorCorrector(dt, dampedOscillator); // 3
+
+        double e1 = 0, e2 = 0, e3 = 0;  // errors
+        double analyticalSolutionX;
 
         System.out.println("Initial conditions and parameters:\n" +
                 "dt = " + dt + " seconds\n" +
-                "dt2 = " + dt2 + " seconds (" + logStep + " times dt)");
+                "dt2 = " + dt2 + " seconds (" + logStep + " times dt)\n" +
+                "cut time = " + tf);
 
-        // TODO: log initial state ?
+        // TODO: log initial parameters ?
+        // TODO: log initial positions
+        System.out.println("t,beeman,verlet,gpc,analytical_solution");
+        System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
 
         while(time < tf) {
-            dampedOscillator.analyticalSolution(p1, time);
-            beeman.nextStep(p2);
-            velocityVerlet.nextStep(p3);
-            gearPredictorCorrector.nextStep(p4);
+            time += dt;
 
-            // TODO: calculate errors
+            beeman.nextStep(p1);
+            verlet.nextStep(p2);
+            gearPredictorCorrector.nextStep(p3);
 
-            time += dt; // FIXME: antes o despues de evolucionar?
+            analyticalSolutionX = dampedOscillator.analyticalSolution(p4, time).getX(); // 'y' is not necessary (y=0)
+            p4.setX(analyticalSolutionX);
+
+            e1 += Utils.squaredError(p1.getX(), analyticalSolutionX);
+            e2 += Utils.squaredError(p2.getX(), analyticalSolutionX);
+            e3 += Utils.squaredError(p3.getX(), analyticalSolutionX);
+
             aux++;
 
             if(aux == logStep) {
-                // TODO: log state
+                // TODO: log time and positions
+                System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
+                dampedOscillator.analyticalSolution(p4, time);
                 aux = 0;
             }
         }
+
+        final double n = time / dt;     // in fact it's an int, but it's not significant for the mse calculus
+        final double mse1 = e1 / n, mse2 = e2 / n, mse3 = e3 / n;   // mean squared errors
+
+        // TODO: log mean squared errors
+        System.out.println("\nMean squared errors:" + "\nBeeman: " + mse1 + "\nVerlet: " + mse2 + "\nGPC: " + mse3);
     }
 
     public static void simulateSystem2() throws IOException {

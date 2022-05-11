@@ -2,9 +2,9 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-//        ej1();
+        ej1();
 
-        ej2();
+//        ej2();
     }
 
     private static void ej1() throws IOException {
@@ -17,7 +17,7 @@ public class Main {
 
         // Condiciones iniciales
         final double r0 = 1;               // r(t=0) = 1 m ==> A = 1 m
-        final double v0 = -A * gamma / 2;  // v(t=0) = -A*gamma/(2m) m/s
+        final double v0 = -A * gamma / (2 * m);  // v(t=0) = -A*gamma/(2*m) m/s
 
         final double dt = 0.0001;
         final double dt2 = dt*1000;

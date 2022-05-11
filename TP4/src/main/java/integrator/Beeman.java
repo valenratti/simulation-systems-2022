@@ -3,6 +3,7 @@ package integrator;
 import model.Particle;
 import system.oscilator.System;
 import utils.Pair;
+import utils.Utils;
 
 public class Beeman implements Integrator {
     private double dt;
@@ -26,7 +27,7 @@ public class Beeman implements Integrator {
 
         if(fPrev == null)   // first step
             // estimamos las posiciones y velocidades anteriores con Euler evaluado en -dt
-            fPrev = euler(particle, -dt, system);
+            fPrev = system.force( Utils.euler(particle, -dt, system) );
 
         final double axPrev = fPrev.getX() / m, ayPrev = fPrev.getY() / m;
 
@@ -47,24 +48,7 @@ public class Beeman implements Integrator {
         final double vyNext = nextVelocity(vy, ay, ayPrev, fNext.getY() / m);
 
         particle.updateState(rxNext, ryNext, vxNext, vyNext);
-        fPrev = fNext;
-    }
-
-    private Pair euler(Particle particle, double dt, System system) {
-        final Pair f0 = system.force(particle);
-        final double m = particle.getMass();
-        final double ax0 = f0.getX() / m, ay0 = f0.getY();
-        final double vx0 = particle.getVx(), vy0 = particle.getVy();
-
-        final double rx = particle.getX() + dt * vx0 + dt * dt / 2 * ax0;
-        final double ry = particle.getY() + dt * vy0 + dt * dt / 2 * ay0;
-
-        final double vx = vx0 + dt * ax0;
-        final double vy = vy0 + dt * ay0;
-
-        final Particle auxParticle = new Particle(rx, ry, vx, vy, m, particle.getCharge(), true);
-
-        return system.force(auxParticle);
+        fPrev = f;
     }
 
     private double nextPosition(double r, double v, double a, double aPrev) {

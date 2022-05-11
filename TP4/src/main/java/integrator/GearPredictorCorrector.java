@@ -5,6 +5,7 @@ import system.oscilator.System;
 import utils.Pair;
 import utils.Utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,8 +41,8 @@ public class GearPredictorCorrector implements Integrator {
         final double r4x = fD2.getX() / m, r4y = fD2.getY() / m;
         final double r5x = fD3.getX() / m, r5y = fD3.getY() / m;
 
-        final List<Double> rxList = Arrays.asList(rx, r1x, r2x, r3x, r4x, r5x);
-        final List<Double> ryList = Arrays.asList(ry, r1y, r2y, r3y, r4y, r5y);
+        final List<Double> rxList = new ArrayList<>(Arrays.asList(rx, r1x, r2x, r3x, r4x, r5x));
+        final List<Double> ryList = new ArrayList<>(Arrays.asList(ry, r1y, r2y, r3y, r4y, r5y));
 
         // predicted position
         final double predictedRx = taylor(rxList);
