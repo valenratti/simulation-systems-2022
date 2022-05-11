@@ -94,7 +94,7 @@ public class Particle {
     }
 
     public double getKineticEnergy() {
-        return 0.5 * this.mass * Math.pow( Math.abs( getVModule() ), 2 );
+        return 0.5 * this.mass * Math.pow(getVModule() , 2);
     }
 
     public double getElectrostaticPotentialEnergy( List<Particle> particles ) {

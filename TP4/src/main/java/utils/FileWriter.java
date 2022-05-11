@@ -1,27 +1,36 @@
 package utils;
 
 import system.particlepropagation.ParticlePropagation;
+import system.particlepropagation.State;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FileWriter {
 
     private static BufferedWriter simulationBufferedWriter;
 
-    public static void generateXYZFile(ParticlePropagation particlePropagation){
+    public static void generateXYZFile(double initialV){
         try{
-            java.io.FileWriter fileWriter = new java.io.FileWriter("positions-" + LocalDateTime.now() + ".csv");
+            java.io.FileWriter fileWriter = new java.io.FileWriter("positions-" + LocalDateTime.now()  + "-" + initialV + ".csv");
             simulationBufferedWriter = new BufferedWriter(fileWriter);
         }catch(IOException e){
             System.out.println(e);
         }
     }
 
-    public static void printParticlePropagation(ParticlePropagation particlePropagation) throws IOException {
+    public static void reset(){
+        simulationBufferedWriter = null;
+    }
+
+    public static void printParticlePropagation(ParticlePropagation particlePropagation, double initialV) throws IOException {
         if(simulationBufferedWriter == null){
-            generateXYZFile(particlePropagation);
+            generateXYZFile(initialV);
         }
         int i=0;
         for(Pair position : particlePropagation.getParticlePositions()) {
@@ -42,8 +51,37 @@ public class FileWriter {
                 simulationBufferedWriter.flush();
             }
         }
+    }
 
+    public static void printEnergyDiffVsTime(Map<Double, Double> values, double dt) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("energydiff-" + LocalDateTime.now() + "-dt-" + dt + ".csv");
+        BufferedWriter energyDiffVsTimeBufferedWriter = new BufferedWriter(fileWriter);
+        energyDiffVsTimeBufferedWriter.write("t, energy_diff");
+        energyDiffVsTimeBufferedWriter.newLine();
+        for(double key : values.keySet().stream().sorted(Comparator.naturalOrder()).collect(Collectors.toList())){
+            energyDiffVsTimeBufferedWriter.write(key + "," + values.get(key));
+            energyDiffVsTimeBufferedWriter.newLine();
+        }
+        energyDiffVsTimeBufferedWriter.flush();
+    }
 
+    public static void printParticleLengthTrajectory(List<Double> averages, List<Double> std, double dt, double vm) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("lengthtrajectory-" + LocalDateTime.now() + "-vm-" + vm + ".csv");
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write("t, average_length, std_length");
+        bufferedWriter.newLine();
+        for(int i=0; i< averages.size(); i++){
+            bufferedWriter.write((double) i * dt + "," + averages.get(i) + "," + std.get(i));
+            bufferedWriter.newLine();
+        }
+        bufferedWriter.flush();
+    }
+
+    public static void printEndStateResultsByV0(Map<Double, Map<State,Integer>> endStateResults) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("endState-" + LocalDateTime.now() + ".csv");
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+//        bufferedWriter.write("t, average_length, std_length");
+        bufferedWriter.newLine();
     }
 
 }

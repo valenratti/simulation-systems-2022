@@ -28,14 +28,14 @@ public class Pair {
     }
 
     public Pair add(Pair pair){
-        this.x = pair.getX();
-        this.y = pair.getY();
+        this.x += pair.getX();
+        this.y += pair.getY();
         return this;
     }
 
     public Pair multiplyBy(double value){
-        this.x = this.x * value;
-        this.y = this.y * value;
+        this.x *= value;
+        this.y *= value;
         return this;
     }
 
