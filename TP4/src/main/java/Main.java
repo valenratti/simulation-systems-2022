@@ -1,3 +1,4 @@
+import utils.FileWriter;
 import utils.Utils;
 
 import java.io.IOException;
@@ -26,20 +27,30 @@ public class Main {
         final double r0 = 1;               // r(t=0) = 1 m ==> A = 1 m
         final double v0 = -A * gamma / (2 * m);  // v(t=0) = -A*gamma/(2*m) m/s
 
-        final double dt = 0.0001;
-        final double dt2 = dt*1000;
+        final boolean ANALYSING_BEST_DT = false;     // in order not to comment/uncomment parts of the code
 
-//        Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, dt, dt*1000);
+        if(ANALYSING_BEST_DT) {
+            List<Double> dtList = new ArrayList<>(Arrays.asList(0.05, 0.01, 5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5));
 
-        List<Double> dtList = new ArrayList<>(Arrays.asList(0.05, 0.01, 5e-3, 1e-3, 5e-4, 1e-4, 5e-5, 1e-5));
+            List<Double> auxList, dtMseList;
+            List<List<Double>> dtMseListList = new ArrayList<>();
 
-        List<Double> mseList;
+            System.out.println("dt,\tbeeman,\tverlet,\tgpc");
 
-        System.out.println("dt,\tbeeman,\tverlet,\tgpc");
+            for (double dt : dtList) {
+                auxList = (Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, dt, tf)); // dt2 = tf because we don't care to log the positions right now
+                dtMseList = new ArrayList<>(auxList);
+                dtMseListList.add(dtMseList);
+                System.out.println(Utils.fromDoubleListToCsvLine(dt, dtMseList, "%.3e"));
+            }
 
-        for(double dtt : dtList) {
-            mseList = (Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, dtt, dtt * 100));
-            System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList(dtt, mseList.get(0), mseList.get(1), mseList.get(2)), "%.3e"));
+            FileWriter.printDtVsMse(dtList, dtMseListList);
+        }
+        else {
+            final double best_dt = 1e-4;
+            final double dt2 = best_dt * 1000;
+
+            Simulator.simulateSystem1(m, k, gamma, A, tf, r0, v0, best_dt, dt2);
         }
     }
 

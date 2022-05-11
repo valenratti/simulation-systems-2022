@@ -39,10 +39,7 @@ public class Simulator {
 //                "dt2 = " + dt2 + " seconds (" + logStep + " times dt)\n" +
 //                "cut time = " + tf);
 
-        // TODO: log initial parameters ?
-        // TODO: log initial positions
-//        System.out.println("t,beeman,verlet,gpc,analytical_solution");
-//        System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
+        FileWriter.logPositions(time, Arrays.asList( p1.getX(), p2.getX(), p3.getX(), p4.getX() ));
 
         while(time < tf) {
             time += dt;
@@ -61,8 +58,7 @@ public class Simulator {
             aux++;
 
             if(aux == logStep) {
-                // TODO: log time and positions
-//                System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
+                FileWriter.logPositions(time, Arrays.asList( p1.getX(), p2.getX(), p3.getX(), p4.getX() ));
                 dampedOscillator.analyticalSolution(p4, time);
                 aux = 0;
             }
@@ -70,9 +66,6 @@ public class Simulator {
 
         final double n = time / dt;     // in fact it's an int, but it's not significant for the mse calculus
         final double mse1 = e1 / n, mse2 = e2 / n, mse3 = e3 / n;   // mean squared errors
-
-        // TODO: log mean squared errors
-//        System.out.println("\nMean squared errors (dt = " + dt + ")\nBeeman: " + mse1 + "\nVerlet: " + mse2 + "\nGPC: " + mse3);
 
         return new ArrayList<>(Arrays.asList(mse1, mse2, mse3));
     }

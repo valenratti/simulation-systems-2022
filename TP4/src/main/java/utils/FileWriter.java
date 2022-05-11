@@ -1,19 +1,18 @@
 package utils;
 
+import model.Particle;
 import system.particlepropagation.ParticlePropagation;
 import system.particlepropagation.State;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDateTime;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class FileWriter {
 
     private static BufferedWriter simulationBufferedWriter;
+    private static boolean logPositionsAppend = false;
 
     public static void generateXYZFile(double initialV){
         try{
@@ -84,4 +83,41 @@ public class FileWriter {
         bufferedWriter.newLine();
     }
 
+    public static void printDtVsMse(List<Double> dtList, List<List<Double>> values) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("./outputs/system1/dt-mse" + ".csv");
+        BufferedWriter bw = new BufferedWriter(fileWriter);
+
+        bw.write("dt,beeman,verlet,gpc");
+        bw.newLine();
+
+        for(int i = 0; i < dtList.size(); i++){
+            bw.write(Utils.fromDoubleListToCsvLine(dtList.get(i), values.get(i), "%.3e"));
+            bw.newLine();
+        }
+
+        bw.flush();
+    }
+
+    public static void logPositions(double time, List<Double> positions) {
+        File file = new File("./outputs/system1/positions.csv");
+        FileOutputStream fos = null;
+
+        try {
+            fos = new FileOutputStream(file, logPositionsAppend);
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            return;
+        }
+
+        PrintStream ps = new PrintStream(fos);
+
+        if(!logPositionsAppend) {
+            logPositionsAppend = true;
+            ps.println("t,beeman,verlet,gpc,analytical_solution");
+        }
+
+        ps.println(Utils.fromDoubleListToCsvLine(time, positions, "%.3e"));
+
+        ps.close();
+    }
 }
