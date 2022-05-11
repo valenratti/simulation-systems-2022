@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.*;
 
 public class Simulator {
-    public static void simulateSystem1(double m, int k, int gamma, double A, double tf, double r0, double v0, double dt, double dt2) {
+    public static List<Double> simulateSystem1(double m, int k, int gamma, double A, double tf, double r0, double v0, double dt, double dt2) {
         // time unit --> seconds
 
         double time = 0.0;
@@ -34,15 +34,15 @@ public class Simulator {
         double e1 = 0, e2 = 0, e3 = 0;  // errors
         double analyticalSolutionX;
 
-        System.out.println("Initial conditions and parameters:\n" +
-                "dt = " + dt + " seconds\n" +
-                "dt2 = " + dt2 + " seconds (" + logStep + " times dt)\n" +
-                "cut time = " + tf);
+//        System.out.println("Initial conditions and parameters:\n" +
+//                "dt = " + dt + " seconds\n" +
+//                "dt2 = " + dt2 + " seconds (" + logStep + " times dt)\n" +
+//                "cut time = " + tf);
 
         // TODO: log initial parameters ?
         // TODO: log initial positions
-        System.out.println("t,beeman,verlet,gpc,analytical_solution");
-        System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
+//        System.out.println("t,beeman,verlet,gpc,analytical_solution");
+//        System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
 
         while(time < tf) {
             time += dt;
@@ -62,7 +62,7 @@ public class Simulator {
 
             if(aux == logStep) {
                 // TODO: log time and positions
-                System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
+//                System.out.println( Utils.fromDoubleListToCsvLine( Arrays.asList( time, p1.getX(), p2.getX(), p3.getX(), p4.getX() ) ) );
                 dampedOscillator.analyticalSolution(p4, time);
                 aux = 0;
             }
@@ -72,7 +72,9 @@ public class Simulator {
         final double mse1 = e1 / n, mse2 = e2 / n, mse3 = e3 / n;   // mean squared errors
 
         // TODO: log mean squared errors
-        System.out.println("\nMean squared errors:" + "\nBeeman: " + mse1 + "\nVerlet: " + mse2 + "\nGPC: " + mse3);
+//        System.out.println("\nMean squared errors (dt = " + dt + ")\nBeeman: " + mse1 + "\nVerlet: " + mse2 + "\nGPC: " + mse3);
+
+        return new ArrayList<>(Arrays.asList(mse1, mse2, mse3));
     }
 
     public static void simulateSystem2() throws IOException {

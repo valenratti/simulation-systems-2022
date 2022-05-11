@@ -28,11 +28,11 @@ public class Utils {
         return Math.pow(x1 - x2, 2);
     }
 
-    public static String fromDoubleListToCsvLine(List<Double> list) {
+    public static String fromDoubleListToCsvLine(List<Double> list, String format) {
         StringBuilder ans = new StringBuilder();
 
         for(Double s : list)
-            ans.append(String.format("%.4f", s)).append(",");
+            ans.append(String.format(format, s)).append(",\t");
 
         return ans.deleteCharAt(ans.length()-1).toString(); // removes extra comma before returning
     }

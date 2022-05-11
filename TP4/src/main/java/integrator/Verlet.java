@@ -21,6 +21,7 @@ public class Verlet implements Integrator {
         final Pair f = system.force(particle);
         final double m = particle.getMass();
         final double x = particle.getX(), y = particle.getY();
+        final double vx = particle.getVx(), vy = particle.getVy();
         final double ax = f.getX() / m, ay = f.getY() / m;
 
         final double dtSquared = dt * dt;
@@ -36,11 +37,18 @@ public class Verlet implements Integrator {
         final double xNext = 2 * x - xPrev + dtSquared * ax;
         final double yNext = 2 * y - yPrev + dtSquared * ay;
 
-//        final double vx = (xNext - xPrev) / (2 * dt);
-//        final double vy = (yNext - yPrev) / (2 * dt);
+        // Como no tenemos v1, calculamos f1 a partir de x1 y v0. Es un "truco" que dieron en clase
+        final Particle auxParticle = new Particle(xNext, yNext, vx, vy, m, particle.getCharge(), true);
+        final Pair f1 = system.force(auxParticle);
+        final double axNext = f1.getX() / m, ayNext = f1.getY() / m;
 
-        particle.setX(xNext);
-        particle.setY(yNext);
+        final double xNextNext = 2 * xNext - x + dtSquared * axNext;
+        final double yNextNext = 2 * yNext - y + dtSquared * ayNext;
+
+        final double vxNext = (xNextNext - x) / (2 * dt);
+        final double vyNext = (yNextNext - y) / (2 * dt);
+
+        particle.updateState(xNext, yNext, vxNext, vyNext);
 
         xPrev = x;
         yPrev = y;
