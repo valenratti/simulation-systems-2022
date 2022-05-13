@@ -21,42 +21,60 @@ def plots_system1():
 
 
 def plots_system2():
-    # plots_2_1()
+    plots_2_1()
     # plots_2_2()
-    plots_2_3()
+    # plots_2_3()
     # plots_2_4()
 
 
 def plots_2_1():
-    col_names = []
-    lists = read_csv_columns_to_lists(sys2_path + ".csv", col_names)
+    dts = [1e-18, 1e-17, 1e-16, 1e-15, 1e-14]
+    col_names = ['t', ' energy_diff']
+
+    times = []
+    reds = []   # relative energy differences
+
+    for dt in [18, 17, 16, 15, 14]:
+        lists = read_csv_columns_to_lists(sys2_path + "dieron_mejor/energydiff-dt-1.0E-" + str(dt) + ".csv", col_names)
+        times.append(lists[0])
+        reds.append(lists[1])
+
+    plots.time_vs_energy(dts, times, reds, 'diferencia relativa de energía', 5e4)
+
+    red_avgs = []   # relative energy differences averages
+    stdevs = []
+
+    for red in reds:
+        stdevs.append(np.std(red))
+        red_avgs.append(sum(red) / len(red))
+
+    plots.dt_vs_energy(dts, red_avgs, stdevs, 'promedio diferencia relativa de energía', 5e4)
 
 
 def plots_2_2():
-    col_names = []
-    lists = read_csv_columns_to_lists(sys2_path + ".csv", col_names)
+    col_names = ['v_module', ' average_length', ' std_length']
+    lists = read_csv_columns_to_lists(sys2_path + "lengthtrajectory.csv", col_names)
+    plots.v0_vs_len(lists[0], lists[1], lists[2], 'longitud promedio de la trayectoria', 1e-15)
+
+    col_names = ['x', ' y']
+    v0s = [5000, 15000, 25000, 35000, 45000]
+
+    for v0 in v0s:
+        lists = read_csv_columns_to_lists(sys2_path + "positions-vo-" + str(v0) + ".0.csv", col_names)
+        plots.trajectory(lists[0], lists[1], v0, 1e-15)
 
 
 def plots_2_3():
     col_names = ['v0', 'left', 'right', 'up', 'down', 'absorb']
-    lists = read_csv_columns_to_lists(sys2_path + "percentages-v0.csv", col_names)
-    plots.percentages_per_v0(np.array(lists[0]), np.array(lists[1]), np.array(lists[2]),
-                             np.array(lists[3]), np.array(lists[4]), np.array(lists[5]))
-
-    # fake data
-    v0 = np.array([5e3, 1e4, 5e4])
-    left = np.array([0.4, 0.2, 0.1])
-    right = np.array([0.1, 0.2, 0.5])
-    up = np.array([0.05, 0, 0.05])
-    down = np.array([0, 0, 0.05])
-    absorb = np.array([0.45, 0.6, 0.3])
-
-    plots.percentages_per_v0(v0, left * 100, right * 100, up * 100, down * 100, absorb * 100)
+    lists = read_csv_columns_to_lists(sys2_path + "endState.csv", col_names)
+    plots.percentages_per_v0(np.array(lists[0]), np.array(lists[1])*100, np.array(lists[2])*100,
+                             np.array(lists[3])*100, np.array(lists[4])*100, np.array(lists[5])*100, 1e-15)
 
 
 def plots_2_4():
-    col_names = []
+    col_names = ['v0', ' average_length', ' pdf']
     lists = read_csv_columns_to_lists(sys2_path + ".csv", col_names)
+    plots.trajectory_len_pdf(lists[0], lists[1], lists[2])  # probability density function
 
 
 def read_csv_columns_to_lists(file_name, col_names):
@@ -72,5 +90,5 @@ def read_csv_columns_to_lists(file_name, col_names):
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    plots_system1()
-    # plots_system2()
+    # plots_system1()
+    plots_system2()
