@@ -1,6 +1,8 @@
 package system.particlepropagation;
 
+import integrator.GearPredictorCorrector;
 import model.Particle;
+import system.oscilator.Gravity;
 import utils.FileWriter;
 import utils.Pair;
 import utils.Utils;
@@ -9,6 +11,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ParticlePropagation {
     //Configuration variables
@@ -27,7 +30,8 @@ public class ParticlePropagation {
 
     //Simulation information
     private final List<Pair> particlePositions;
-    private final List<Double> deltaEnergyThroughTime;
+    private final List<Double> energyDiffThroughTime;
+    private GearPredictorCorrector gearPredictorCorrector;
 
 
     public ParticlePropagation(double d, double dt, double initialVx, double initialVy, double mass) {
@@ -50,7 +54,8 @@ public class ParticlePropagation {
         this.particlePositions = new LinkedList<>();
         particlePositions.add(new Pair(movingParticle.getX(), movingParticle.getY()));
         this.initialTotalEnergy = movingParticle.getTotalEnergy(crystalParticles);
-        this.deltaEnergyThroughTime = new ArrayList<>();
+        this.energyDiffThroughTime = new ArrayList<>();
+        this.gearPredictorCorrector = new GearPredictorCorrector(dt, new Gravity());
     }
 
     public ParticlePropagation(double d, double dt, double initialVx, double initialVy, double mass, double initialY){
@@ -72,7 +77,7 @@ public class ParticlePropagation {
         this.particlePositions = new LinkedList<>();
         particlePositions.add(new Pair(movingParticle.getX(), movingParticle.getY()));
         this.initialTotalEnergy = movingParticle.getTotalEnergy(crystalParticles);
-        this.deltaEnergyThroughTime = new ArrayList<>();
+        this.energyDiffThroughTime = new ArrayList<>();
     }
 
     public State simulate(boolean writeResults) throws IOException {
@@ -97,7 +102,7 @@ public class ParticlePropagation {
         if(newState.equals(State.UNFINISHED)){
             particlePositions.add(new Pair(movingParticle.getX(), movingParticle.getY()));
         }
-        this.deltaEnergyThroughTime.add(Math.abs(initialTotalEnergy - movingParticle.getTotalEnergy(crystalParticles)) / initialTotalEnergy);
+        this.energyDiffThroughTime.add(Math.abs(movingParticle.getTotalEnergy(crystalParticles) / initialTotalEnergy - 1));
         return newState;
     }
 
@@ -133,7 +138,7 @@ public class ParticlePropagation {
             return State.INSIDE;
         }
         double x = movingParticle.getX();
-        if(x < -2 * d){
+        if(x < - ( d + d / 2) ){
             return State.LEFT_WALL;
         }else if(x > l){
             return State.RIGHT_WALL;
@@ -153,14 +158,39 @@ public class ParticlePropagation {
         movingParticle.setAy(force.getY() / movingParticle.getMass());
 
         if(particlePositions.size() <= 1){
-            // v1 = v0 + a * dt
-            double futureVelocityX = movingParticle.getVx() + movingParticle.getAx() * dt;
-            double futureVelocityY = movingParticle.getVy() + movingParticle.getAy() * dt;
-            double displacedPositionX = futureVelocityX * dt + movingParticle.getAx() * 1/2 * Math.pow(dt, 2);
-            double displacedPositionY = futureVelocityY * dt + movingParticle.getAy() * 1/2 * Math.pow(dt, 2);
-            // ri =  ri-1 + vi.dt + a. (dt^2 / 2)
-            movingParticle.updateState(movingParticle.getX() + displacedPositionX, movingParticle.getY() +
-                    displacedPositionY, futureVelocityX, futureVelocityY);
+
+            final double m = movingParticle.getMass();
+            final double ax0 = force.getX() / m, ay0 = force.getY() / m;
+            final double vx0 = movingParticle.getVx(), vy0 = movingParticle.getVy();
+
+            double previousPositionX = movingParticle.getX() - dt * vx0 + dt * dt / 2 * ax0;
+            double previousPositionY = movingParticle.getY() - dt * vy0 + dt * dt / 2 * ay0;
+
+//            final double previousVelocityX = vx0 - dt * ax0;
+//            final double previousVelocityY = vy0 - dt * ay0;
+
+            double futurePositionX = 2 * movingParticle.getX() - previousPositionX
+                    + movingParticle.getAx() * Math.pow(dt,2);
+            double futurePositionY = 2 * movingParticle.getY() - previousPositionY
+                    + movingParticle.getAy() * Math.pow(dt,2);
+            movingParticle.setX(futurePositionX);
+            movingParticle.setY(futurePositionY);
+
+            //Verlet's new velocity equation
+            double futureVelocityX = (futurePositionX - previousPositionX) * 1/(2 * dt);
+            double futureVelocityY = (futurePositionY - previousPositionY) * 1/(2 * dt);
+            movingParticle.setVx(futureVelocityX);
+            movingParticle.setVy(futureVelocityY);
+
+
+//            // v1 = v0 + a * dt
+//            double futureVelocityX = movingParticle.getVx() + movingParticle.getAx() * dt;
+//            double futureVelocityY = movingParticle.getVy() + movingParticle.getAy() * dt;
+//            double displacedPositionX = futureVelocityX * dt + movingParticle.getAx() * 1/2 * Math.pow(dt, 2);
+//            double displacedPositionY = futureVelocityY * dt + movingParticle.getAy() * 1/2 * Math.pow(dt, 2);
+//            // ri =  ri-1 + vi.dt + a. (dt^2 / 2)
+//            movingParticle.updateState(movingParticle.getX() + displacedPositionX, movingParticle.getY() +
+//                    displacedPositionY, futureVelocityX, futureVelocityY);
 
         }else {
             //Verlet's new position equation
@@ -181,8 +211,7 @@ public class ParticlePropagation {
 
     }
 
-    public List<Double> calculateParticleTrajectory(){
-        List<Double> distances = new ArrayList<>();
+    public Double calculateParticleTrajectory(){
         double distanceGoneThrough = 0.0;
         Pair lastPosition = null;
         for(Pair currentPosition : particlePositions){
@@ -193,9 +222,8 @@ public class ParticlePropagation {
             double distanceX = currentPosition.getX() - lastPosition.getX();
             double distanceY = currentPosition.getY() - lastPosition.getY();
             distanceGoneThrough += Math.hypot(distanceX, distanceY);
-            distances.add(distanceGoneThrough);
         }
-        return distances;
+        return distanceGoneThrough;
     }
 
 
@@ -211,7 +239,8 @@ public class ParticlePropagation {
         return particlePositions;
     }
 
-    public List<Double> getDeltaEnergyThroughTime() {
-        return deltaEnergyThroughTime;
+    public List<Double> getEnergyDiffThroughTime() {
+        return energyDiffThroughTime;
     }
+
 }

@@ -33,7 +33,7 @@ public class FileWriter {
         }
         int i=0;
         for(Pair position : particlePropagation.getParticlePositions()) {
-            if(i++ % 10 == 0) {
+            if(i++ % 100 == 0) {
                 simulationBufferedWriter.write(String.valueOf(particlePropagation.getCrystalParticles().size() + 1));
                 simulationBufferedWriter.newLine();
                 simulationBufferedWriter.newLine();
@@ -52,8 +52,20 @@ public class FileWriter {
         }
     }
 
+    public static void printPositionsFile(List<Pair> positions, double vo) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("positions-vo-" + vo + ".csv");
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write("x, y");
+        bufferedWriter.newLine();
+        for(Pair pair : positions){
+            bufferedWriter.write(pair.getX() + "," + pair.getY());
+            bufferedWriter.newLine();
+        }
+        bufferedWriter.flush();
+    }
+
     public static void printEnergyDiffVsTime(Map<Double, Double> values, double dt) throws IOException {
-        java.io.FileWriter fileWriter = new java.io.FileWriter("energydiff-" + LocalDateTime.now() + "-dt-" + dt + ".csv");
+        java.io.FileWriter fileWriter = new java.io.FileWriter("energydiff-dt-" + dt + ".csv");
         BufferedWriter energyDiffVsTimeBufferedWriter = new BufferedWriter(fileWriter);
         energyDiffVsTimeBufferedWriter.write("t, energy_diff");
         energyDiffVsTimeBufferedWriter.newLine();
@@ -64,23 +76,46 @@ public class FileWriter {
         energyDiffVsTimeBufferedWriter.flush();
     }
 
-    public static void printParticleLengthTrajectory(List<Double> averages, List<Double> std, double dt, double vm) throws IOException {
-        java.io.FileWriter fileWriter = new java.io.FileWriter("lengthtrajectory-" + LocalDateTime.now() + "-vm-" + vm + ".csv");
+    public static void printParticleLengthTrajectory(Map<Double, Pair> trajectoryResults) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("lengthtrajectory" + ".csv");
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-        bufferedWriter.write("t, average_length, std_length");
+        bufferedWriter.write("v_module, average_length, std_length");
         bufferedWriter.newLine();
-        for(int i=0; i< averages.size(); i++){
-            bufferedWriter.write((double) i * dt + "," + averages.get(i) + "," + std.get(i));
+        for(Map.Entry<Double,Pair> entry : trajectoryResults.entrySet()){
+            bufferedWriter.write(entry.getKey() + "," + entry.getValue().getX() + "," + entry.getValue().getY());
             bufferedWriter.newLine();
         }
         bufferedWriter.flush();
     }
 
-    public static void printEndStateResultsByV0(Map<Double, Map<State,Integer>> endStateResults) throws IOException {
+    public static void printParticleTrajectoryInside(List<Double> trajectories, double v0) throws IOException {
+        java.io.FileWriter fileWriter = new java.io.FileWriter("absorbed-trajectory-vo-" + v0 + ".csv");
+        BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
+        bufferedWriter.write("trajectory");
+        bufferedWriter.newLine();
+        for(Double value : trajectories){
+            bufferedWriter.write(value.toString());
+            bufferedWriter.newLine();
+        }
+        bufferedWriter.flush();
+    }
+
+    public static void printEndStateByV0(Map<Double, Map<State,Integer>> endStateResults) throws IOException {
         java.io.FileWriter fileWriter = new java.io.FileWriter("endState-" + LocalDateTime.now() + ".csv");
         BufferedWriter bufferedWriter = new BufferedWriter(fileWriter);
-//        bufferedWriter.write("t, average_length, std_length");
+        bufferedWriter.write("v0,left,right,up,down,absorb");
         bufferedWriter.newLine();
+        for(Map.Entry<Double, Map<State, Integer>> entry : endStateResults.entrySet()){
+            int total = entry.getValue().values().stream().mapToInt(Integer::intValue).sum();
+            double left = !entry.getValue().containsKey(State.LEFT_WALL) ? 0.0 : (double) entry.getValue().get(State.LEFT_WALL) / total;
+            double right = !entry.getValue().containsKey(State.RIGHT_WALL) ? 0.0 : (double) entry.getValue().get(State.RIGHT_WALL) / total;
+            double up = !entry.getValue().containsKey(State.UPPER_WALL) ? 0.0 : (double) entry.getValue().get(State.UPPER_WALL) / total;
+            double down = !entry.getValue().containsKey(State.LOWER_WALL) ? 0.0 : (double) entry.getValue().get(State.LOWER_WALL) / total;
+            double absorb = !entry.getValue().containsKey(State.INSIDE) ? 0.0 : (double) entry.getValue().get(State.INSIDE) / total;
+            bufferedWriter.write(entry.getKey() + "," + left + "," + right + "," + up + "," + down + "," + absorb);
+            bufferedWriter.newLine();
+        }
+        bufferedWriter.flush();
     }
 
     public static void printDtVsMse(List<Double> dtList, List<List<Double>> values) throws IOException {
@@ -120,4 +155,6 @@ public class FileWriter {
 
         ps.close();
     }
+
+
 }

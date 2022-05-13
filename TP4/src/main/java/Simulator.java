@@ -6,6 +6,7 @@ import system.oscilator.DampedOscillator;
 import system.particlepropagation.ParticlePropagation;
 import system.particlepropagation.State;
 import utils.FileWriter;
+import utils.Pair;
 import utils.Utils;
 
 import java.io.IOException;
@@ -76,36 +77,37 @@ public class Simulator {
     }
 
     public static void ej2_1() throws IOException {
-        List<Double> dtList = Arrays.asList(1e-13, 1e-14, 1e-15, 1e-16, 1e-17);
+        List<Double> dtList = Arrays.asList(1e-14, 1e-15, 1e-16, 1e-17, 1e-18);
 //        double initialY = Utils.randDouble((l/2) - d, (l/2) + d);
         double d = 1e-8;
         double l = d * 15;
         double initialY = (l / 2) - d;
         double yVariation = 2 * d / 5;
-        List<Double> initialYList = Arrays.asList(initialY, initialY + yVariation, initialY + 2 * yVariation, initialY
-                + 3 * yVariation, initialY + 4 * yVariation);
+        List<Double> initialYList = Arrays.asList( l/2);
+
         for (double currentDt : dtList) {
             List<List<Double>> energyLists = new ArrayList<>();
             Map<Double, Double> dtEnergyMap = new HashMap<>();
+
             for (double y : initialYList) {
                 ParticlePropagation particlePropagation = new ParticlePropagation(d, currentDt, 5e+4, 0, 1e-27, y);
                 particlePropagation.simulate(false);
-                energyLists.add(particlePropagation.getDeltaEnergyThroughTime());
+                energyLists.add(particlePropagation.getEnergyDiffThroughTime());
             }
 
             int maxSize = energyLists.stream().max(Comparator.comparing(List::size)).get().size();
             for (int i = 1; i < maxSize + 1; i++) {
                 int qty = 0;
-                double value = 0;
+                double energyValue = 0;
                 for (List<Double> currentList : energyLists) {
                     try {
-                        value += currentList.get(i - 1);
+                        energyValue += currentList.get(i - 1);
                         qty++;
                     } catch (IndexOutOfBoundsException e) {
                         //do nothing.
                     }
                 }
-                dtEnergyMap.put(i * currentDt, value / qty);
+                dtEnergyMap.put(i * currentDt, energyValue / qty);
             }
             FileWriter.printEnergyDiffVsTime(dtEnergyMap, currentDt);
         }
@@ -114,52 +116,44 @@ public class Simulator {
     }
 
     public static void ej2_2() throws IOException {
-        int samplesQty = 30;
+        int samplesQty = 300;
         double[] velocitiesArray = new double[]{50, 150, 250, 350, 450};
         double velocityMultiplier = 1e+2;
         double d = 1e-8;
         double dt = 1e-15;
         Map<Double, Map<State,Integer>> endStateResults = new HashMap<>();
+        Map<Double, Pair> trajectoryResults = new HashMap<>();
         for (double v : velocitiesArray) {
             Map<State, Integer> endStateCount = new HashMap<>();
-            List<List<Double>> particleTrajectoryList = new ArrayList<>();
+            List<Double> particleTrajectoryList = new ArrayList<>();
             double velocityX = v * velocityMultiplier;
             for (int i = 0; i < samplesQty; i++) {
                 ParticlePropagation particlePropagation = new ParticlePropagation(d, dt, velocityX, 0.0, 1e-27);
                 //Only save last sample
                 State endState = particlePropagation.simulate(i == samplesQty - 1);
-                endStateCount.put(endState, endStateCount.get(endState) + 1);
-                particleTrajectoryList.add(particlePropagation.calculateParticleTrajectory());
+                if(i == samplesQty - 1) {
+//                    FileWriter.printPositionsFile(particlePropagation.getParticlePositions(), velocityX);
+                }
+                FileWriter.reset();
+                endStateCount.put(endState, endStateCount.containsKey(endState) ? endStateCount.get(endState) + 1 : 1);
+                if(endState.equals(State.INSIDE)) {
+                    particleTrajectoryList.add(particlePropagation.calculateParticleTrajectory());
+                }
             }
             endStateResults.put(velocityX, endStateCount);
+            FileWriter.printParticleTrajectoryInside(particleTrajectoryList, velocityX);
 
-            List<Double> avgLengths = new LinkedList<>();
-            List<Double> stdLengths = new LinkedList<>();
-            int maxSize = particleTrajectoryList.stream()
-                    .map(List::size)
-                    .max(Comparator.naturalOrder())
-                    .get();
-            for (int i = 0; i < maxSize; i++) {
-                List<Double> valuesAtI = new LinkedList<>();
-                for (List<Double> lengths : particleTrajectoryList) {
-                    if (lengths.size() > i) {
-                        valuesAtI.add(lengths.get(i));
-                    }
-                }
-                Double avg = valuesAtI.stream()
-                        .reduce((x, y) -> x + y)
-                        .get() / valuesAtI.size();
+            double avgTrajectory = particleTrajectoryList.stream()
+                    .mapToDouble((Double::doubleValue))
+                    .sum() / particleTrajectoryList.size();
 
-                Double std = Math.sqrt(valuesAtI.stream()
-                        .map(val -> Math.pow(val - avg, 2))
-                        .reduce((v1, v2) -> v1 + v2)
-                        .get() / valuesAtI.size());
-
-                avgLengths.add(avg);
-                stdLengths.add(std);
+            double std = Math.sqrt(particleTrajectoryList.stream()
+                    .map(val -> Math.pow(val - avgTrajectory, 2))
+                    .reduce(Double::sum).get() / particleTrajectoryList.size());
+            trajectoryResults.put(velocityX, new Pair(avgTrajectory, std));
             }
-            FileWriter.printParticleLengthTrajectory(avgLengths, stdLengths, dt, velocityX);
-            FileWriter.reset();
+            FileWriter.printParticleLengthTrajectory(trajectoryResults);
+            FileWriter.printEndStateByV0(endStateResults);
         }
-    }
 }
+
