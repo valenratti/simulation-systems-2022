@@ -1,5 +1,7 @@
 import pandas
 import numpy as np
+import seaborn as sns
+from matplotlib import pyplot as plt
 
 import plots
 
@@ -17,14 +19,14 @@ def plots_system1():
 
     col_names = ['dt', 'beeman', 'verlet', 'gpc']
     lists = read_csv_columns_to_lists(sys1_path + "dt-mse.csv", col_names)
-    plots.plot_mse(lists[0], lists[1], lists[2], lists[3])
+    # plots.plot_mse(lists[0], lists[1], lists[2], lists[3])
 
 
 def plots_system2():
-    plots_2_1()
+    # plots_2_1()
     # plots_2_2()
     # plots_2_3()
-    # plots_2_4()
+    plots_2_4()
 
 
 def plots_2_1():
@@ -72,9 +74,14 @@ def plots_2_3():
 
 
 def plots_2_4():
-    col_names = ['v0', ' average_length', ' pdf']
-    lists = read_csv_columns_to_lists(sys2_path + ".csv", col_names)
-    plots.trajectory_len_pdf(lists[0], lists[1], lists[2])  # probability density function
+    col_names = ['trajectory']
+    v0s = [5000, 15000, 25000, 35000, 45000]
+    data_list = []
+
+    for v0 in v0s:
+        data_list.append(read_csv_columns_to_lists(sys2_path + "absorbed-trajectory-vo-" + str(v0) + ".0.csv", col_names))
+
+    plots.trajectory_len_pdf(v0s, data_list)  # probability density function
 
 
 def read_csv_columns_to_lists(file_name, col_names):

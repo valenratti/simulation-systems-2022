@@ -1,5 +1,7 @@
 from matplotlib import pyplot as plt
 import numpy as np
+import seaborn as sns
+from scipy.stats import norm
 
 
 def plot_solutions(time, beeman, verlet, gpc, analytical_solution):
@@ -12,8 +14,10 @@ def plot_solutions(time, beeman, verlet, gpc, analytical_solution):
     plt.ylabel('posición [m]')
     # plt.title(f'')
 
-    # plt.xlim(3.15059, 3.1506)
-    # plt.ylim(0.1046, 0.10469)
+    # zoom in
+    plt.xlim(3.1505, 3.1506)
+    plt.ylim(0.1046799, 0.104681)
+    plt.yscale("log")
 
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5))
     plt.tight_layout()
@@ -21,9 +25,9 @@ def plot_solutions(time, beeman, verlet, gpc, analytical_solution):
 
 
 def plot_mse(dt, beeman, verlet, gpc):
-    plt.plot(dt, beeman, 'o', label="Beeman")
-    plt.plot(dt, verlet, 'o', label="Verlet")
-    plt.plot(dt, gpc, 'o', label="GPC")
+    plt.plot(dt, beeman, '-o', label="Beeman")
+    plt.plot(dt, verlet, '-o', label="Verlet")
+    plt.plot(dt, gpc, '-o', label="GPC")
 
     plt.xlabel('dt [s]')
     plt.ylabel('ECM [$m^2$]')
@@ -66,13 +70,14 @@ def percentages_per_v0(v0, left, right, up, down, absorb, dt):
     plt.show()
 
 
-def time_vs_energy(dts, times, y_data, y_label, dt):
+def time_vs_energy(dts, times, y_data, y_label, v0):
     for i in range(len(dts)):
         plt.plot(times[i], y_data[i], label=format(dts[i], '.0e'))
 
     plt.xlabel('tiempo [s]')
     plt.ylabel(y_label)
-    plt.title(f'dt = {dt} s')
+    v0_s = format(v0, '.0e')
+    plt.title(f'v0 = {v0_s} m/s')
 
     plt.yscale("log")
 
@@ -81,12 +86,13 @@ def time_vs_energy(dts, times, y_data, y_label, dt):
     plt.show()
 
 
-def dt_vs_energy(dts, red_avgs, stdevs, y_label, dt):
+def dt_vs_energy(dts, red_avgs, stdevs, y_label, v0):
     plt.errorbar(dts, red_avgs, yerr=stdevs, linestyle='None', marker='o')
 
     plt.xlabel('dt [s]')
     plt.ylabel(y_label)
-    plt.title(f'dt = {dt} s')
+    v0_s = format(v0, '.0e')
+    plt.title(f'v0 = {v0_s} m/s')
 
     plt.xscale("log")
     plt.yscale("log")
@@ -113,6 +119,7 @@ def trajectory(x_list, y_list, v0, dt):
     plt.plot(x_list, y_list)
     plt.xlabel('x [m]')
     plt.ylabel('y [m]')
+    plt.suptitle('Trayectoria de la partícula')
     plt.title(f'v0 = {v0} m/s, dt = {dt} s')
 
     plt.tight_layout()
@@ -120,10 +127,19 @@ def trajectory(x_list, y_list, v0, dt):
 
 
 # Probability Density Function
-def trajectory_len_pdf(v0s, trajectory_lens, pdfs):
-    for v0 in v0s:
-        plt.plot(trajectory_lens, pdfs, label=str(v0))
+def trajectory_len_pdf(v0s, data_list):
+    for i in range(len(v0s)):
+        # aux = sorted(data_list[i])
+        # plt.plot(aux, norm.pdf(aux))
+        sns.distplot(data_list[i], hist=False, kde=True,
+                     kde_kws={'linewidth': 1}, label=str(v0s[i]))
+    plt.xscale("log")
+    # plt.yscale("symlog")
 
+    plt.xlabel('longitud de la trayectoria [m]')
+    plt.ylabel('densidad')
+
+    plt.title(f'dt = {1e-15} s')
     plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title='v0 [m/s]')
     plt.tight_layout()
     plt.show()
