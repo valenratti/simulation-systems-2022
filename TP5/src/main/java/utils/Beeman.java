@@ -1,4 +1,6 @@
-import utils.Pair;
+package utils;
+
+import model.Particle;
 
 public class Beeman {
     private double dt;

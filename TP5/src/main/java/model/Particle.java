@@ -1,4 +1,4 @@
-import java.util.List;
+package model;
 
 public class Particle {
     private static Long currentId = 0L;
@@ -13,6 +13,7 @@ public class Particle {
     private static final double k = 1e10;
     private double ax; //acceleration x
     private double ay; //acceleration y
+    private Cell cell;
 
     public Particle(double x, double y, double vx, double vy, double mass, double radius, boolean idDisposable) {
         this.id = idDisposable ? null : currentId++;
@@ -70,16 +71,8 @@ public class Particle {
         return mass;
     }
 
-    public void setMass(double mass) {
-        this.mass = mass;
-    }
-
     public double getRadius() {
         return radius;
-    }
-
-    public void setRadius(double radius) {
-        this.radius = radius;
     }
 
     public void updateState(double x, double y, double vx, double vy) {
@@ -97,15 +90,35 @@ public class Particle {
         return ax;
     }
 
-    public void setAx(double ax) {
-        this.ax = ax;
-    }
-
     public double getAy() {
         return ay;
     }
 
-    public void setAy(double ay) {
-        this.ay = ay;
+    public Cell getCell() {
+        return cell;
+    }
+
+    public void setCell(Cell cell) {
+        this.cell = cell;
+    }
+
+    public static double distance(Particle p1, Particle p2, Boolean periodicBorderCondition, double length) {
+        double aux, x, y;
+        double x1 = p1.getX(), x2 = p2.getX(), y1 = p1.getY(), y2 = p2.getY(),
+                r1 = p1.getRadius(), r2 = p2.getRadius();
+
+        if(periodicBorderCondition) {
+            aux = Math.abs(x1 - x2);
+            x = Math.min(aux, Math.abs(length - aux));
+
+            aux = Math.abs(y1 - y2);
+            y = Math.min(aux, Math.abs(length - aux));
+        }
+        else {
+            x = x1 - x2;
+            y = y1 - y2;
+        }
+
+        return Math.hypot(x, y) - (r1 + r2); //hypot(x,y) returns sqrt(x^2 + y^2)
     }
 }
