@@ -10,19 +10,11 @@ public class Area {
     private List<Particle> particleList;
     private boolean periodicBorder;
 
-    public Area(double width, double height) {
-        this.width = width;
-        this.height = height;
-        this.rc = 0;
-        this.periodicBorder = false;    // solo cuando salen por debajo
-        this.particleList = new ArrayList<>();
-    }
-
     public Area(double width, double height, List<Particle> particleList) {
         this.width = width;
         this.height = height;
-        this.rc = 0;
         this.particleList = particleList;
+        this.rc = 0;
         this.periodicBorder = false;    // solo cuando salen por debajo
     }
 
@@ -38,31 +30,15 @@ public class Area {
         return height;
     }
 
-    public void setHeight(double height) {
-        this.height = height;
-    }
-
     public double getRc() {
         return rc;
-    }
-
-    public void setRc(double rc) {
-        this.rc = rc;
     }
 
     public List<Particle> getParticleList() {
         return particleList;
     }
 
-    public void setParticleList(List<Particle> particleList) {
-        this.particleList = particleList;
-    }
-
     public boolean isPeriodicBorder() {
         return periodicBorder;
-    }
-
-    public void setPeriodicBorder(boolean periodicBorder) {
-        this.periodicBorder = periodicBorder;
     }
 }

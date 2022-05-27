@@ -1,3 +1,5 @@
+import cell_index_method.CIMConfig;
+
 public class Main {
     public static void main(String[] args) {
         // L > W > D
@@ -9,6 +11,8 @@ public class Main {
         final int N = 1000;  // number of particles TBD
         final double m = 0.01;  // kg
 
-        Simulator.simulate(L, W, D, minRadius, maxRadius, N, m);
+        final CIMConfig config = new CIMConfig(L, W, D, N, minRadius, maxRadius, m);
+
+        Simulator.simulate(config);
     }
 }
