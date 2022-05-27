@@ -6,13 +6,15 @@ import java.util.List;
 public class Area {
     private double width;
     private double height;
-    private double rc;
+    private double exitWidth;
     private List<Particle> particleList;
+    private double rc;
     private boolean periodicBorder;
 
-    public Area(double width, double height, List<Particle> particleList) {
+    public Area(double width, double height, double exitWidth, List<Particle> particleList) {
         this.width = width;
         this.height = height;
+        this.exitWidth = exitWidth;
         this.particleList = particleList;
         this.rc = 0;
         this.periodicBorder = false;    // solo cuando salen por debajo
@@ -28,6 +30,10 @@ public class Area {
 
     public double getHeight() {
         return height;
+    }
+
+    public double getExitWidth() {
+        return exitWidth;
     }
 
     public double getRc() {

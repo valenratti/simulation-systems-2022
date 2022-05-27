@@ -8,8 +8,9 @@ public class CIMConfig {
     private Double minParticleRadius;
     private Double maxParticleRadius;
     private Double particleMass;
+    private Double heightBelowExit;
 
-    public CIMConfig(Double areaHeight, Double areaWidth, Double exitWidth, Integer totalParticles, Double minParticleRadius, Double maxParticleRadius, Double particleMass) {
+    public CIMConfig(Double areaHeight, Double areaWidth, Double exitWidth, Integer totalParticles, Double minParticleRadius, Double maxParticleRadius, Double particleMass, Double heightBelowExit) {
         this.areaHeight = areaHeight;
         this.areaWidth = areaWidth;
         this.exitWidth = exitWidth;
@@ -17,6 +18,7 @@ public class CIMConfig {
         this.minParticleRadius = minParticleRadius;
         this.maxParticleRadius = maxParticleRadius;
         this.particleMass = particleMass;
+        this.heightBelowExit = heightBelowExit;
     }
 
     public Double getAreaHeight() {
@@ -47,4 +49,7 @@ public class CIMConfig {
         return particleMass;
     }
 
+    public Double getHeightBelowExit() {
+        return heightBelowExit;
+    }
 }

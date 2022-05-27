@@ -46,7 +46,15 @@ public class CellIndexMethod {
                 }
             }
 
-        this.area = new Area(config.getAreaWidth(), config.getAreaHeight(), particleList);
+        // extra space after exit --> L / 10
+        int extraCells = (int) Math.floor(config.getHeightBelowExit() / 10 / config.getMaxParticleRadius() * 2);
+        extraCells = extraCells == 0 ? 1 : extraCells;
+
+        for(int i = cellsPerColumn; i < cellsPerColumn + extraCells; i++)
+            for(int j = 0; j < cellsPerRow; j++)
+                cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
+
+        this.area = new Area(config.getAreaWidth(), config.getAreaHeight(), config.getExitWidth(), particleList);
     }
 
     private Particle generateParticle(double i, double j) {
@@ -59,13 +67,13 @@ public class CellIndexMethod {
     }
 
     private void calculateParticleCell(Particle particle, int row, int column) {
-        Cell cell = this.getCellMap().getOrDefault(new CellCoordinates(row, column), new Cell(row, column, new ArrayList<>()));
+        Cell cell = cellMap.getOrDefault(new CellCoordinates(row, column), new Cell(row, column, new ArrayList<>()));
         particle.setCell(cell);
         cell.addParticle(particle);
         cellMap.put(new CellCoordinates(row, column), cell);
     }
 
-    public void calculateNeighbours() throws FileNotFoundException {
+    public Map<Long, List<Long>> calculateNeighbours() {
         // TODO: check this whole method
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
 
@@ -91,6 +99,7 @@ public class CellIndexMethod {
             }
         }
         results = neighboursMap;
+        return neighboursMap;
     }
 
     // true ==> row
@@ -184,10 +193,6 @@ public class CellIndexMethod {
 
     public Map<Long, List<Long>> getResults() {
         return results;
-    }
-
-    public void setArea(Area area) {
-        this.area = area;
     }
 
     public Map<CellCoordinates, Cell> getCellMap() {

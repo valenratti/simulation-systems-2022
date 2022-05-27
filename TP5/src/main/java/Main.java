@@ -11,8 +11,12 @@ public class Main {
         final int N = 1000;  // number of particles TBD
         final double m = 0.01;  // kg
 
-        final CIMConfig config = new CIMConfig(L, W, D, N, minRadius, maxRadius, m);
+        final CIMConfig config = new CIMConfig(L, W, D, N, minRadius, maxRadius, m, L / 10);
 
-        Simulator.simulate(config);
+        // dt de referencia --> dt = 0.1 * sqrt(m / kn)
+        double dt = 1e-4, dt2 =1e-2;
+//        dt = 0.1 * Math.sqrt(m / 1e5);
+
+        Simulator.simulate(config, dt, dt2);
     }
 }

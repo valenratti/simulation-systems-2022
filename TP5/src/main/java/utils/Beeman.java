@@ -6,6 +6,8 @@ public class Beeman {
     private double dt;
     private boolean isForceVelocityDependent;
     private Pair fPrev; // initially null
+    final private int kn = (int) 1e5;   // 10^5 N/m
+    final private int kt = 2 * kn;
 
     public Beeman(double dt, boolean isForceVelocityDependent) {
         this.dt = dt;
