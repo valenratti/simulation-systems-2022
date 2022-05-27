@@ -2,6 +2,8 @@ package utils;
 
 import model.Particle;
 
+import java.util.List;
+
 public class Beeman {
     private double dt;
     private boolean isForceVelocityDependent;
@@ -16,7 +18,7 @@ public class Beeman {
 
     // receives the force value of the previous state of the particle (fPrev) and updates it
     // since this integrator needs the acceleration of the previous state
-    public void nextStep(final Particle particle) {
+    public void nextStep(final Particle particle, List<Particle> particleList) {
         final Pair f = force(particle);
         final double m = particle.getMass();
         final double ax = f.getX() / m, ay = f.getY() / m;

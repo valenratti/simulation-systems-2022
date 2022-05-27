@@ -7,6 +7,7 @@ import utils.Utils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class Simulator {
 
@@ -31,9 +32,7 @@ public class Simulator {
             time += dt;
 
             Map<Long, List<Long>> neighboursMap = cellIndexMethod.calculateNeighbours();
-            particleList.forEach(beeman::nextStep); // FIXME: con el neighboursMap, no con particleList
-
-            // TODO: collisions with walls
+            nextStep(neighboursMap, particleList, beeman);
 
             energies.add(Utils.calculateSystemKineticEnergy(particleList));
 
@@ -55,6 +54,20 @@ public class Simulator {
         // TODO: print time vs flow
         // TODO: print time vs kinetic energy
 
+    }
+
+    private static void nextStep(Map<Long, List<Long>> neighboursMap, List<Particle> particleList, Beeman beeman) {
+        List<Particle> interactionParticles;
+
+        for(Long particleId : neighboursMap.keySet()) {
+            interactionParticles = neighboursMap
+                    .get(particleId)
+                    .stream()
+                    .map(id -> particleList.get(Math.toIntExact(id)))
+                    .collect(Collectors.toList());
+            // TODO: add collisions with walls before calling beeman.nextStep
+            beeman.nextStep(particleList.get(Math.toIntExact(particleId)), interactionParticles);
+        }
     }
 
 }
