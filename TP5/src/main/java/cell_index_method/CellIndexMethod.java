@@ -21,27 +21,27 @@ public class CellIndexMethod {
     private Map<Long, List<Long>> results;
     private Map<CellCoordinates, Cell> cellMap;
     private boolean periodicBorder;
+    private int cellsPerRow;
     private int cellsPerColumn;
     private CIMConfig config;
 
     public CellIndexMethod(Area area, CIMConfig config) {
         this.area = area;
-        this.cellsPerColumn = calculateCellsPerColumn(config);
-        this.cellMap = new HashMap<>();
         this.config = config;
+        this.cellsPerRow = calculateCellsPerRowOrColumn(true);
+        this.cellsPerColumn = calculateCellsPerRowOrColumn(false);
+        this.cellMap = new HashMap<>();
 
-        for(int i = 0; i < cellsPerColumn; i++){
-            for(int j = 0; j < cellsPerColumn; j++){
+        for(int i = 0; i < cellsPerColumn; i++)
+            for(int j = 0; j < cellsPerRow; j++)
                 cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
-            }
-        }
+
         area.getParticleList().forEach(this::calculateParticleCell);
     }
 
-
     private void calculateParticleCell(Particle particle){
-        int column = (int) Math.floor(particle.getX() / (area.getLength() / this.getCellsPerColumn()));
-        int row = (int) Math.floor(particle.getY() / (area.getLength() / this.getCellsPerColumn()));
+        int row = (int) Math.floor(particle.getY() / (area.getHeight() / this.getCellsPerColumn()));    // TODO check: height o width?
+        int column = (int) Math.floor(particle.getX() / (area.getWidth() / this.getCellsPerRow()));     // TODO check: height o width?
         Cell cell = this.getCellMap().getOrDefault(new CellCoordinates(row, column), new Cell(row, column, new ArrayList<>()));
         particle.setCell(cell);
         cell.addParticle(particle);
@@ -52,14 +52,14 @@ public class CellIndexMethod {
         Map<Long, List<Long>> neighboursMap = new HashMap<>();
 
         for(Cell cell : cellMap.values()){
-            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn(), config.isPeriodicBorderCondition()).stream()
+            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn()).stream()
                     .map((coords) -> cellMap.get(coords)).collect(Collectors.toList());
 
             for (Particle particle : cell.getParticleList()) {
                 List<Long> currentParticleNeighbours = neighboursMap.getOrDefault(particle.getId(), new ArrayList<>());
-                for(Cell neighbourCell : neighbourCells){
+                for(Cell neighbourCell : neighbourCells) {
                     List<Long> neighbourIds = neighbourCell.getParticleList().stream()
-                            .filter((current) -> Particle.distance(particle, current, config.isPeriodicBorderCondition(), area.getLength()) < area.getRc())
+                            .filter((current) -> Particle.distance(particle, current, area.getHeight()) < area.getRc())
                             .map(Particle::getId).collect(Collectors.toList());
 
                     neighbourIds.forEach((id) -> {
@@ -75,28 +75,24 @@ public class CellIndexMethod {
         results = neighboursMap;
     }
 
-    private static int calculateCellsPerColumn(CIMConfig config){
-        Double maxRadius;
-        if(config.getMaxParticleRadius() != null){
-            maxRadius = config.getMaxParticleRadius();
-        }else {
-            maxRadius = config.getParticleFixedRadius();
-        }
-        if(config.getCellsPerColumn() != null){
-            if(config.getAreaLength() / (config.getCellsPerColumn()) > (maxRadius * 2 + config.getInteractionRadius()))
-                return config.getCellsPerColumn();
-        }
+    // true ==> row
+    // false ==> column
+    private int calculateCellsPerRowOrColumn(boolean perRow){
+        double interactionRadius = 0;
+        double maxRadius = config.getMaxParticleRadius();
+        double L = perRow ? config.getAreaWidth() : config.getAreaHeight();
 
-        int possibleM = (int) Math.floor(config.getAreaLength() / (config.getInteractionRadius() + (maxRadius * 2)));
+        int possibleM = (int) Math.floor(L / (interactionRadius + (maxRadius * 2)));
+
         return possibleM == 0 ? 1 : possibleM;
     }
 
-
-
-    private List<CellCoordinates> calculateNeighbourCells(int i, int j, Boolean periodicBorderCondition){
+    private List<CellCoordinates> calculateNeighbourCells(int i, int j){
         int M = this.cellsPerColumn;
         List<CellCoordinates> cellCoordinates = new ArrayList<>();
         cellCoordinates.add(new CellCoordinates(i,j));
+        boolean periodicBorderCondition = false;
+
         if(periodicBorderCondition) {
             cellCoordinates.add(new CellCoordinates(i, (j + 1) % M)); //Derecha
             cellCoordinates.add(new CellCoordinates((i + 1) % M, (j + 1) % M)); // Diagonal abajo
@@ -105,6 +101,7 @@ public class CellIndexMethod {
         }
         else {
             boolean lastCol = j + 1 == M, firstRow = i == 0, lastRow = i + 1 == M;
+
             if(!lastCol) {
                 cellCoordinates.add(new CellCoordinates(i, j + 1)); //Derecha
                 if(!lastRow)
@@ -150,15 +147,16 @@ public class CellIndexMethod {
         ps.close();
     }
 
-    private static String writeNeighbours(Long id, final List<Long> neighbours) {
+    private String writeNeighbours(Long id, final List<Long> neighbours) {
         StringBuilder list = new StringBuilder();
         neighbours.forEach(neighbourId -> {
-            if(!id.equals(neighbourId)) {
+            if(!id.equals(neighbourId))
                 list.append(neighbourId).append("-");
-            }
         });
+
         if(list.length() > 0)
             return list.substring(0, list.length() - 1);
+
         return list.toString();
     }
 
@@ -192,6 +190,14 @@ public class CellIndexMethod {
 
     public void setPeriodicBorder(boolean periodicBorder) {
         this.periodicBorder = periodicBorder;
+    }
+
+    public int getCellsPerRow() {
+        return cellsPerRow;
+    }
+
+    public void setCellsPerRow(int cellsPerRow) {
+        this.cellsPerRow = cellsPerRow;
     }
 
     public int getCellsPerColumn() {

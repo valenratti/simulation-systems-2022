@@ -3,32 +3,37 @@ package cell_index_method;
 import java.io.File;
 
 public class CIMConfig {
-    private Double areaLength; //L
+    private Double areaHeight; //L
+    private Double areaWidth; //W
     private Integer totalParticles; //N
-    private Integer cellsPerColumn; //M
-    private Double interactionRadius;  //Rc
-    private Boolean periodicBorderCondition;
-    private Double particleFixedRadius;
+    private Integer cellsPerRow;
+    private Integer cellsPerColumn;
+    private Double minParticleRadius;
     private Double maxParticleRadius;
     private File fileInput;
 
-    public CIMConfig(Double areaLength, Integer totalParticles, Integer cellsPerColumn, Double interactionRadius, Boolean periodicBorderCondition, Double particleFixedRadius, Double maxParticleRadius, File fileInput) {
-        this.areaLength = areaLength;
+    public CIMConfig(Double areaHeight, Integer totalParticles, Double minParticleRadius, Double maxParticleRadius, File fileInput) {
+        this.areaHeight = areaHeight;
         this.totalParticles = totalParticles;
-        this.cellsPerColumn = cellsPerColumn;
-        this.interactionRadius = interactionRadius;
-        this.periodicBorderCondition = periodicBorderCondition;
-        this.particleFixedRadius = particleFixedRadius;
+        this.minParticleRadius = minParticleRadius;
         this.maxParticleRadius = maxParticleRadius;
         this.fileInput = fileInput;
     }
 
-    public Double getAreaLength() {
-        return areaLength;
+    public Double getAreaHeight() {
+        return areaHeight;
     }
 
-    public void setAreaLength(Double areaLength) {
-        this.areaLength = areaLength;
+    public void setAreaHeight(Double areaHeight) {
+        this.areaHeight = areaHeight;
+    }
+
+    public Double getAreaWidth() {
+        return areaWidth;
+    }
+
+    public void setAreaWidth(Double areaWidth) {
+        this.areaWidth = areaWidth;
     }
 
     public Integer getTotalParticles() {
@@ -39,6 +44,14 @@ public class CIMConfig {
         this.totalParticles = totalParticles;
     }
 
+    public Integer getCellsPerRow() {
+        return cellsPerRow;
+    }
+
+    public void setCellsPerRow(Integer cellsPerRow) {
+        this.cellsPerRow = cellsPerRow;
+    }
+
     public Integer getCellsPerColumn() {
         return cellsPerColumn;
     }
@@ -47,20 +60,8 @@ public class CIMConfig {
         this.cellsPerColumn = cellsPerColumn;
     }
 
-    public Double getInteractionRadius() {
-        return interactionRadius;
-    }
-
-    public void setInteractionRadius(Double interactionRadius) {
-        this.interactionRadius = interactionRadius;
-    }
-
-    public Boolean isPeriodicBorderCondition() {
-        return periodicBorderCondition;
-    }
-
-    public Double getParticleFixedRadius() {
-        return particleFixedRadius;
+    public Double getMinParticleRadius() {
+        return minParticleRadius;
     }
 
     public Double getMaxParticleRadius() {

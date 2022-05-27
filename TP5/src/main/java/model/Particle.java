@@ -102,10 +102,11 @@ public class Particle {
         this.cell = cell;
     }
 
-    public static double distance(Particle p1, Particle p2, Boolean periodicBorderCondition, double length) {
+    public static double distance(Particle p1, Particle p2, double length) {
         double aux, x, y;
         double x1 = p1.getX(), x2 = p2.getX(), y1 = p1.getY(), y2 = p2.getY(),
                 r1 = p1.getRadius(), r2 = p2.getRadius();
+        boolean periodicBorderCondition = false;
 
         if(periodicBorderCondition) {
             aux = Math.abs(x1 - x2);

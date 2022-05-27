@@ -4,35 +4,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Area {
-    private double length;
+    private double width;
+    private double height;
     private double rc;
     private List<Particle> particleList;
     private boolean periodicBorder;
 
-    public Area(double length, double rc, boolean periodicBorder) {
-        this.length = length;
-        this.rc = rc;
-        this.periodicBorder = periodicBorder;
+    public Area(double width, double height) {
+        this.width = width;
+        this.height = height;
+        this.rc = 0;
+        this.periodicBorder = false;    // solo cuando salen por debajo
         this.particleList = new ArrayList<>();
     }
 
-    public Area(double length, double rc, List<Particle> particleList, boolean periodicBorder) {
-        this.length = length;
-        this.rc = rc;
+    public Area(double width, double height, List<Particle> particleList) {
+        this.width = width;
+        this.height = height;
+        this.rc = 0;
         this.particleList = particleList;
-        this.periodicBorder = periodicBorder;
+        this.periodicBorder = false;    // solo cuando salen por debajo
     }
 
     public void addParticle(Particle particle){
         particleList.add(particle);
     }
 
-    public double getLength() {
-        return length;
+    public double getWidth() {
+        return width;
     }
 
-    public void setLength(double length) {
-        this.length = length;
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
     }
 
     public double getRc() {
