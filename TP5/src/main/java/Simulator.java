@@ -32,9 +32,11 @@ public class Simulator {
         // TODO: log initial state
 
         while(!flowStabilized) {
+            if(time != 0.0) {
+                cellIndexMethod.updateParticles(particleList);
+            }
             time += dt;
-
-            Map<Long, List<Long>> neighboursMap = cellIndexMethod.calculateNeighbours();
+            Map<Particle, List<Particle>> neighboursMap = cellIndexMethod.calculateNeighbours();
             nextStep(neighboursMap, particleList, beeman);
 
             energies.add(Utils.calculateSystemKineticEnergy(particleList));
@@ -56,20 +58,15 @@ public class Simulator {
         // TODO: valor medio y desv estandar del caudal
         // TODO: print time vs flow
         // TODO: print time vs kinetic energy
-
+        cellIndexMethod.clear();
     }
 
-    private static void nextStep(Map<Long, List<Long>> neighboursMap, List<Particle> particleList, Beeman beeman) {
+    private static void nextStep(Map<Particle, List<Particle>> neighboursMap, List<Particle> particleList, Beeman beeman) {
         List<Particle> interactionParticles;
 
-        for(Long particleId : neighboursMap.keySet()) {
-            interactionParticles = neighboursMap
-                    .get(particleId)
-                    .stream()
-                    .map(id -> particleList.get(Math.toIntExact(id)))
-                    .collect(Collectors.toList());
+        for(Particle particle : neighboursMap.keySet()) {
             // TODO: add collisions with walls before calling beeman.nextStep
-            beeman.nextStep(particleList.get(Math.toIntExact(particleId)), interactionParticles, Collections.emptyList());
+            beeman.nextStep(particle, neighboursMap.get(particle), Collections.emptyList());
         }
     }
 

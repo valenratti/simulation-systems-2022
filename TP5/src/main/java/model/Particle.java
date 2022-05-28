@@ -155,4 +155,19 @@ public class Particle {
         Vector v = this.getVelocity().subtract(p.getVelocity());
         return v.getX() * tangencial.getX() + v.getY() * tangencial.getY();
     }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Particle particle = (Particle) o;
+
+        return id.equals(particle.id);
+    }
 }
