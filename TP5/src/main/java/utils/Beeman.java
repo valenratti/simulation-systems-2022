@@ -1,25 +1,29 @@
 package utils;
 
+import model.ForceCalculator;
 import model.Particle;
+import model.Wall;
 
 import java.util.List;
 
 public class Beeman {
     private double dt;
     private boolean isForceVelocityDependent;
-    private Pair fPrev; // initially null
+    private Vector fPrev; // initially null
     final private int kn = (int) 1e5;   // 10^5 N/m
     final private int kt = 2 * kn;
+    private ForceCalculator forceCalculator;
 
-    public Beeman(double dt, boolean isForceVelocityDependent) {
+    public Beeman(double dt, boolean isForceVelocityDependent, ForceCalculator forceCalculator) {
         this.dt = dt;
         this.isForceVelocityDependent = isForceVelocityDependent;
+        this.forceCalculator = forceCalculator;
     }
 
     // receives the force value of the previous state of the particle (fPrev) and updates it
     // since this integrator needs the acceleration of the previous state
-    public void nextStep(final Particle particle, List<Particle> particleList) {
-        final Pair f = force(particle);
+    public void nextStep(final Particle particle, List<Particle> neighbours, List<Wall> walls) {
+        final Vector f = force(particle, neighbours, walls);
         final double m = particle.getMass();
         final double ax = f.getX() / m, ay = f.getY() / m;
         final double vx = particle.getVx(), vy = particle.getVy();
@@ -27,7 +31,7 @@ public class Beeman {
 
         if(fPrev == null)   // first step
             // estimamos las posiciones y velocidades anteriores con Euler evaluado en -dt
-            fPrev = force( euler(particle, -dt) );
+            fPrev = euler(particle, -dt, neighbours, walls).getPosition();
 
         final double axPrev = fPrev.getX() / m, ayPrev = fPrev.getY() / m;
 
@@ -42,7 +46,7 @@ public class Beeman {
         }
 
         final Particle auxParticle = new Particle(rxNext, ryNext, auxVx, auxVy, m, particle.getRadius(), true);
-        final Pair fNext = force(auxParticle);
+        final Vector fNext = force(auxParticle, neighbours, walls);
 
         final double vxNext = nextVelocity(vx, ax, axPrev, fNext.getX() / m);
         final double vyNext = nextVelocity(vy, ay, ayPrev, fNext.getY() / m);
@@ -65,13 +69,12 @@ public class Beeman {
         return v + (double) 1/3 * aNext * dt + (double) 5/6 * a * dt - (double) 1/6 * aPrev * dt;
     }
 
-    private Pair force(Particle p) {
-        // TODO
-        return new Pair(0, 0);
+    private Vector force(Particle p, List<Particle> neighbours, List<Wall> walls) {
+        return forceCalculator.getForceAppliedOnParticle(p, neighbours, walls);
     }
 
-    private Particle euler(Particle particle, double dt) {
-        final Pair f0 = force(particle);
+    private Particle euler(Particle particle, double dt, List<Particle> neighbours, List<Wall> walls) {
+        final Vector f0 = force(particle, neighbours, walls);
         final double m = particle.getMass();
         final double ax0 = f0.getX() / m, ay0 = f0.getY();
         final double vx0 = particle.getVx(), vy0 = particle.getVy();

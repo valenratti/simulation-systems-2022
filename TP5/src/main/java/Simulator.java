@@ -1,10 +1,12 @@
 import cell_index_method.CIMConfig;
 import cell_index_method.CellIndexMethod;
+import granular_media.GranularMedia;
 import model.Particle;
 import utils.Beeman;
 import utils.Utils;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -13,7 +15,8 @@ public class Simulator {
 
     public static void simulate(final CIMConfig config, final double dt, final double dt2) {
         CellIndexMethod cellIndexMethod = new CellIndexMethod(config);
-        Beeman beeman = new Beeman(dt, true);
+        double kn = 10e+5, kt = 2*kn, boxWidth = 0.3, boxHeight = 1.0;
+        Beeman beeman = new Beeman(dt, true, new GranularMedia(kn, kt, boxWidth, boxHeight));
 
         List<Particle> particleList = cellIndexMethod.getArea().getParticleList();
 
@@ -66,7 +69,7 @@ public class Simulator {
                     .map(id -> particleList.get(Math.toIntExact(id)))
                     .collect(Collectors.toList());
             // TODO: add collisions with walls before calling beeman.nextStep
-            beeman.nextStep(particleList.get(Math.toIntExact(particleId)), interactionParticles);
+            beeman.nextStep(particleList.get(Math.toIntExact(particleId)), interactionParticles, Collections.emptyList());
         }
     }
 
