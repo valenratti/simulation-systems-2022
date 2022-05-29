@@ -29,9 +29,10 @@ public class Beeman {
         final double vx = particle.getVx(), vy = particle.getVy();
         final double rx = particle.getX(), ry = particle.getY();
 
-        if(fPrev == null)   // first step
+        if(fPrev == null) {  // first step
             // estimamos las posiciones y velocidades anteriores con Euler evaluado en -dt
             fPrev = euler(particle, -dt, neighbours, walls).getPosition();
+        }
 
         final double axPrev = fPrev.getX() / m, ayPrev = fPrev.getY() / m;
 

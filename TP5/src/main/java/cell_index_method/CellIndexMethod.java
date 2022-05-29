@@ -4,12 +4,10 @@ import model.Area;
 import model.Cell;
 import model.CellCoordinates;
 import model.Particle;
+import utils.FileWriter;
 import utils.Utils;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintStream;
+import java.io.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -154,9 +152,21 @@ public class CellIndexMethod {
         for(Particle particle : particles) {
             int row = (int) Math.floor(particle.getY() / this.cellSideLength);
             int column = (int) Math.floor(particle.getX() / this.cellSideLength);
-            if(row >= 0 && row <= cellsPerColumn && column >= 0 && column <= cellsPerRow){
-                cellMap.get(new CellCoordinates(row, column)).addParticle(particle);
-                currentOccupiedCells.add(new CellCoordinates(row,column));
+            try {
+                if (row >= 0 && row <= cellsPerColumn && column >= 0 && column <= cellsPerRow) {
+                    cellMap.get(new CellCoordinates(row, column)).addParticle(particle);
+                    currentOccupiedCells.add(new CellCoordinates(row, column));
+                }
+            } catch (Exception e){
+                try {
+                    FileWriter.printPositions(particles);
+                }catch (IOException ex){
+                    System.out.println(ex.getMessage());
+                }
+                System.out.println("Wrong dt. Particle with id:" + particle.getId());
+                System.out.println(row + " " + column);
+                System.out.println(particle.getY() + " " + particle.getX());
+                System.exit(0);
             }
         }
         this.currentOccupiedCells = currentOccupiedCells;

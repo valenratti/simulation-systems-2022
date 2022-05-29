@@ -4,15 +4,17 @@ import granular_media.GranularMedia;
 import model.Particle;
 import model.Wall;
 import utils.Beeman;
+import utils.FileWriter;
 import utils.Utils;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class Simulator {
 
-    public static void simulate(final CIMConfig config, final double dt, final double dt2) {
+    public static void simulate(final CIMConfig config, final double dt, final double dt2) throws IOException {
         CellIndexMethod cellIndexMethod = new CellIndexMethod(config);
         double kn = 10e+5, kt = 2*kn, boxWidth = config.getAreaWidth(), boxHeight = config.getAreaHeight();
         Beeman beeman = new Beeman(dt, true, new GranularMedia(kn, kt, boxWidth, boxHeight));
@@ -54,10 +56,11 @@ public class Simulator {
 
 
             aux++;
-            if(aux == logStep) {
-                // TODO: log
+            if(aux == 500) {
+                FileWriter.printPositions(particleList);
                 aux = 0;
             }
+            cellIndexMethod.clear();
         }
 
         // TODO: Beverloo
@@ -65,7 +68,6 @@ public class Simulator {
         // TODO: valor medio y desv estandar del caudal
         // TODO: print time vs flow
         // TODO: print time vs kinetic energy
-        cellIndexMethod.clear();
     }
 
     private static void resetParticle(Particle particle, CIMConfig config, List<Particle> particles) {

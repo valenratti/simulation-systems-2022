@@ -1,7 +1,9 @@
 import cell_index_method.CIMConfig;
 
+import java.io.IOException;
+
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         // L > W > D
         final double L = 1.0;   // L en [1, 1.5] m
         final double W = 0.3;   // W en [0.3, 0.4] m
