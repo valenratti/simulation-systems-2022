@@ -80,6 +80,7 @@ public class CellIndexMethod {
         for(Cell cell : cellMap.values()){
             List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn())
                     .stream().map(cellMap::get)
+                    .filter(Objects::nonNull)
                     .collect(Collectors.toList());
 
             for (Particle particle : cell.getParticleList()) {
@@ -165,7 +166,7 @@ public class CellIndexMethod {
      * Clears all cells leaving them without any particle inside
      */
     public void clear(){
-        cellMap.values().parallelStream().forEach((list) -> list.getParticleList().clear());
+        cellMap.values().forEach((list) -> list.getParticleList().clear());
     }
 
     public Area getArea() {

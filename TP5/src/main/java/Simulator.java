@@ -7,13 +7,14 @@ import utils.Beeman;
 import utils.Utils;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class Simulator {
 
     public static void simulate(final CIMConfig config, final double dt, final double dt2) {
         CellIndexMethod cellIndexMethod = new CellIndexMethod(config);
-        double kn = 10e+5, kt = 2*kn, boxWidth = 0.3, boxHeight = 1.0;
+        double kn = 10e+5, kt = 2*kn, boxWidth = config.getAreaWidth(), boxHeight = config.getAreaHeight();
         Beeman beeman = new Beeman(dt, true, new GranularMedia(kn, kt, boxWidth, boxHeight));
 
         List<Particle> particleList = cellIndexMethod.getArea().getParticleList();
@@ -24,6 +25,7 @@ public class Simulator {
         List<Double> energies = new ArrayList<>(); // time unit --> seconds
 
         double time = 0.0;
+        AtomicInteger caudal = new AtomicInteger();
         int aux = 0;    // aux = (time % dt2) / dt  <--> aux * dt = time + k * dt2
         final double logStep = dt2 / dt;    // dt2 = logStep * dt
 
@@ -35,18 +37,23 @@ public class Simulator {
             }
             time += dt;
             Map<Particle, List<Particle>> neighboursMap = cellIndexMethod.calculateNeighbours();
-            particleList.parallelStream().forEach((particle) -> {
-                beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()), getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
+            particleList.forEach((particle) -> {
+                beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()),
+                        getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
+                if(particle.getY() >= boxHeight + config.getHeightBelowExit()){
+                    // TODO: reset particles L/10 below exit
+                    // TODO: caudal = nro de particulas que salieron en dt / dt
+                    caudal.getAndIncrement();
+                    resetParticle(particle, config, particleList);
+                }
             });
 
             energies.add(Utils.calculateSystemKineticEnergy(particleList));
 
-            // TODO: caudal = nro de particulas que salieron en dt / dt
             // TODO: update flowStabilized if appropriate
-            // TODO: reset particles L/10 below exit
+
 
             aux++;
-
             if(aux == logStep) {
                 // TODO: log
                 aux = 0;
@@ -59,6 +66,30 @@ public class Simulator {
         // TODO: print time vs flow
         // TODO: print time vs kinetic energy
         cellIndexMethod.clear();
+    }
+
+    private static void resetParticle(Particle particle, CIMConfig config, List<Particle> particles) {
+        double x;
+        double y;
+        do{
+            x = ThreadLocalRandom.current().nextDouble(config.getMaxParticleRadius(),config.getAreaWidth()-config.getMaxParticleRadius());
+            y = ThreadLocalRandom.current().nextDouble( 0, config.getAreaHeight()/3 + config.getMaxParticleRadius());
+        }while (noOverlapParticle(x,y,particle.getRadius(), particles));  //NO NEED TO CHECK WALLS?
+        particle.setX(x);
+        particle.setY(y);
+        particle.setVx(0d);
+        particle.setVy(0d);
+        particle.setPressure(0d);
+    }
+
+    private static boolean noOverlapParticle(double x, double y, double radius, List<Particle> particles) {
+        if (particles.size() == 0) return true;
+        for (Particle particle : particles){
+            if ( (Math.pow(particle.getX() - x, 2) + Math.pow(particle.getY() - y, 2)) <= Math.pow(particle.getRadius() + radius, 2)){
+                return false;
+            }
+        }
+        return true;
     }
 
     private static List<Wall> getWallsCollisions(Particle p, Double boxWidth, Double boxHeight, Double D){
