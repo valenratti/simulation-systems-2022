@@ -45,7 +45,7 @@ public class GranularMedia implements ForceCalculator {
 
         Vector force = new Vector(forceX, forceY);
 
-        force = force.add(new Vector(0d, -9.8*particle.getMass()));
+        force = force.add(new Vector(0d, 9.8*particle.getMass()));
         return force;
     }
 }

@@ -126,27 +126,14 @@ public class Particle {
     }
 
     public static double distance(Particle p1, Particle p2, double length) {
-        double aux, x, y;
-        double x1 = p1.getX(), x2 = p2.getX(), y1 = p1.getY(), y2 = p2.getY(),
-                r1 = p1.getRadius(), r2 = p2.getRadius();
-        boolean periodicBorderCondition = false;
-
-        if(periodicBorderCondition) {
-            aux = Math.abs(x1 - x2);
-            x = Math.min(aux, Math.abs(length - aux));
-
-            aux = Math.abs(y1 - y2);
-            y = Math.min(aux, Math.abs(length - aux));
-        }
-        else {
-            x = x1 - x2;
-            y = y1 - y2;
-        }
-
-        return Math.hypot(x, y) - (r1 + r2); //hypot(x,y) returns sqrt(x^2 + y^2)
+        double y = Math.abs(p2.getY() - p1.getY());
+        double x = Math.abs(p2.getX() - p1.getX());
+        double h = Math.hypot(x, y);
+        return h - p1.getRadius() - p2.getRadius();
     }
 
     public double getOverlap(Particle p){
+        //ξij = Ri + Rj - |rj - ri|
         double overlapSize = this.getRadius() + p.getRadius() - this.getDistance(p);
         return (overlapSize < 0)? 0 : overlapSize;
     }

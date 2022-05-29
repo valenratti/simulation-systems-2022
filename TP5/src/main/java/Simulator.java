@@ -2,13 +2,11 @@ import cell_index_method.CIMConfig;
 import cell_index_method.CellIndexMethod;
 import granular_media.GranularMedia;
 import model.Particle;
+import model.Wall;
 import utils.Beeman;
 import utils.Utils;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Simulator {
@@ -37,7 +35,9 @@ public class Simulator {
             }
             time += dt;
             Map<Particle, List<Particle>> neighboursMap = cellIndexMethod.calculateNeighbours();
-            nextStep(neighboursMap, particleList, beeman);
+            particleList.parallelStream().forEach((particle) -> {
+                beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()), getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
+            });
 
             energies.add(Utils.calculateSystemKineticEnergy(particleList));
 
@@ -61,13 +61,16 @@ public class Simulator {
         cellIndexMethod.clear();
     }
 
-    private static void nextStep(Map<Particle, List<Particle>> neighboursMap, List<Particle> particleList, Beeman beeman) {
-        List<Particle> interactionParticles;
-
-        for(Particle particle : neighboursMap.keySet()) {
-            // TODO: add collisions with walls before calling beeman.nextStep
-            beeman.nextStep(particle, neighboursMap.get(particle), Collections.emptyList());
-        }
+    private static List<Wall> getWallsCollisions(Particle p, Double boxWidth, Double boxHeight, Double D){
+        List<Wall> walls = new LinkedList<>();
+        if (p.getX() < p.getRadius())
+            walls.add(new Wall(Wall.typeOfWall.LEFT));
+        if (boxWidth - p.getX() < p.getRadius())
+            walls.add(new Wall(Wall.typeOfWall.RIGHT));
+        if (boxHeight - p.getY() < p.getRadius())
+            if(p.getX() < boxWidth / 2 - D / 2  || p.getX() > boxWidth / 2 + D / 2 )
+                walls.add(new Wall(Wall.typeOfWall.BOTTOM));
+        return walls;
     }
 
 }

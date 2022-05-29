@@ -17,13 +17,13 @@ public class CellIndexMethod {
 
     private Area area;
     private Map<Particle, List<Particle>> results;
-    private Map<CellCoordinates, Cell> cellMap;
+    private final Map<CellCoordinates, Cell> cellMap;
     private Set<CellCoordinates> currentOccupiedCells;
     private boolean periodicBorder;
-    private int cellsPerRow;
-    private int cellsPerColumn;
-    private double cellSideLength;
-    private CIMConfig config;
+    private final int cellsPerRow;
+    private final int cellsPerColumn;
+    private final double cellSideLength;
+    private final CIMConfig config;
 
     public CellIndexMethod(CIMConfig config) {
         this.config = config;
@@ -47,7 +47,7 @@ public class CellIndexMethod {
             }
 
         // extra space after exit --> L / 10
-        int extraCells = (int) Math.floor(config.getHeightBelowExit() / 10 / config.getMaxParticleRadius() * 2);
+        int extraCells = (int) Math.floor(config.getHeightBelowExit() / config.getMaxParticleRadius() * 2);
         extraCells = extraCells == 0 ? 1 : extraCells;
 
         for(int i = cellsPerColumn; i < cellsPerColumn + extraCells; i++)
@@ -78,13 +78,15 @@ public class CellIndexMethod {
         Map<Particle, List<Particle>> neighboursMap = new HashMap<>();
 
         for(Cell cell : cellMap.values()){
-            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn()).stream()
-                    .map((coords) -> cellMap.get(coords)).collect(Collectors.toList());
+            List<Cell> neighbourCells = calculateNeighbourCells(cell.getRow(), cell.getColumn())
+                    .stream().map(cellMap::get)
+                    .collect(Collectors.toList());
 
             for (Particle particle : cell.getParticleList()) {
                 List<Particle> currentParticleNeighbours = neighboursMap.getOrDefault(particle, new ArrayList<>());
                 for(Cell neighbourCell : neighbourCells) {
-                    List<Particle> neighbours = neighbourCell.getParticleList().stream()
+                    List<Particle> neighbours = neighbourCell.getParticleList()
+                            .stream().filter(current -> !current.equals(particle))
                             .filter((current) -> Particle.distance(particle, current, area.getHeight()) < area.getRc()) // TODO: pending refactor
                             .collect(Collectors.toList());
 
@@ -114,41 +116,43 @@ public class CellIndexMethod {
         return possibleM == 0 ? 1 : possibleM;
     }
 
+    /**
+     * Given a cell (i,j), returns a List
+     * of CellCoordinates with neighbours cells
+     * @param i
+     * @param j
+     * @return
+     */
     private List<CellCoordinates> calculateNeighbourCells(int i, int j){
         int M = this.cellsPerColumn;
         List<CellCoordinates> cellCoordinates = new ArrayList<>();
+        //Add itself as neighbour
         cellCoordinates.add(new CellCoordinates(i,j));
-        boolean periodicBorderCondition = false;
+        boolean lastCol = j + 1 == M, firstRow = i == 0, lastRow = i + 1 == M;
 
-        if(periodicBorderCondition) {
-            cellCoordinates.add(new CellCoordinates(i, (j + 1) % M)); //Derecha
-            cellCoordinates.add(new CellCoordinates((i + 1) % M, (j + 1) % M)); // Diagonal abajo
-            cellCoordinates.add(new CellCoordinates((i - 1 + M) % M, (j + 1) % M)); // Diagonal arriba
-            cellCoordinates.add(new CellCoordinates((i - 1 + M) % M, j)); //  Arriba
-        }
-        else {
-            boolean lastCol = j + 1 == M, firstRow = i == 0, lastRow = i + 1 == M;
-
-            if(!lastCol) {
-                cellCoordinates.add(new CellCoordinates(i, j + 1)); //Derecha
-                if(!lastRow)
-                    cellCoordinates.add(new CellCoordinates(i + 1, j + 1)); // Diagonal abajo
-                if(!firstRow)
-                    cellCoordinates.add(new CellCoordinates(i - 1, j + 1)); // Diagonal arriba
-            }
-
+        if(!lastCol) {
+            cellCoordinates.add(new CellCoordinates(i, j + 1)); //Derecha
+            if(!lastRow)
+                cellCoordinates.add(new CellCoordinates(i + 1, j + 1)); // Diagonal abajo
             if(!firstRow)
-                cellCoordinates.add(new CellCoordinates(i - 1, j)); //  Arriba
+                cellCoordinates.add(new CellCoordinates(i - 1, j + 1)); // Diagonal arriba
         }
-
+        if(!firstRow) {
+            cellCoordinates.add(new CellCoordinates(i - 1, j)); //  Arriba
+        }
         return cellCoordinates;
     }
 
+    /**
+     * Given a list of particles, tries to add the particle
+     * to a certain cell determined by xy position.
+     * @param particles
+     */
     public void updateParticles(List<Particle> particles){
         Set<CellCoordinates> currentOccupiedCells = new HashSet<>();
         for(Particle particle : particles) {
-            int row = (int) Math.floor(particle.getY() / this.cellsPerColumn);
-            int column = (int) Math.floor(particle.getX() / this.cellsPerRow);
+            int row = (int) Math.floor(particle.getY() / this.cellSideLength);
+            int column = (int) Math.floor(particle.getX() / this.cellSideLength);
             if(row >= 0 && row <= cellsPerColumn && column >= 0 && column <= cellsPerRow){
                 cellMap.get(new CellCoordinates(row, column)).addParticle(particle);
                 currentOccupiedCells.add(new CellCoordinates(row,column));
@@ -157,6 +161,9 @@ public class CellIndexMethod {
         this.currentOccupiedCells = currentOccupiedCells;
     }
 
+    /**
+     * Clears all cells leaving them without any particle inside
+     */
     public void clear(){
         cellMap.values().parallelStream().forEach((list) -> list.getParticleList().clear());
     }

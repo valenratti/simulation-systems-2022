@@ -1,6 +1,7 @@
 package model;
 
 import java.util.List;
+import java.util.Objects;
 
 public class Cell {
     private int row;
@@ -39,5 +40,18 @@ public class Cell {
 
     public void setParticleList(List<Particle> particleList) {
         this.particleList = particleList;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Cell cell = (Cell) o;
+        return row == cell.row && column == cell.column;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, column);
     }
 }
