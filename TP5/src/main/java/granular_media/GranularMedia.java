@@ -40,6 +40,9 @@ public class GranularMedia implements ForceCalculator {
             //Fy = FN eny + FT ( enx)
             forceY += normalForceValue * normalizedYDistance + tangencialForceValue * normalizedXDistance;
             pressure += normalForceValue;
+            if(Math.abs(forceX) >= 20 || Math.abs(forceY) >= 20){
+                System.out.println("test");
+            }
         }
         Vector force = new Vector(forceX, forceY);
 
@@ -57,6 +60,9 @@ public class GranularMedia implements ForceCalculator {
 
 
         force = force.add(new Vector(0d, 9.8*particle.getMass()));
+        if(force.getX() >= 1000 || force.getY() >= 1000){
+            System.out.println("test");
+        }
         return force;
     }
 

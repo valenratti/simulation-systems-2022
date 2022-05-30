@@ -32,6 +32,7 @@ public class Simulator {
         final double logStep = dt2 / dt;    // dt2 = logStep * dt
 
         // TODO: log initial state
+        FileWriter.printPositions(particleList);
 
         while(!flowStabilized) {
             if(time != 0.0) {
@@ -56,10 +57,10 @@ public class Simulator {
 
 
             aux++;
-            if(aux == 500) {
+//            if(aux == 500) {
                 FileWriter.printPositions(particleList);
                 aux = 0;
-            }
+//            }
             cellIndexMethod.clear();
         }
 

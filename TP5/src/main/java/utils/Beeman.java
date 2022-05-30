@@ -38,6 +38,14 @@ public class Beeman {
 
         final double rxNext = nextPosition(rx, vx, ax, axPrev);
         final double ryNext = nextPosition(ry, vy, ay, ayPrev);
+        System.out.println(rxNext - particle.getX());
+        System.out.println(ryNext - particle.getY());
+        if(rxNext - particle.getX() >= 0.1){
+            System.out.println("here");
+        }
+        if(ryNext - particle.getY() >= 0.1){
+            System.out.println("here");
+        }
 
         double auxVx = vx, auxVy = vy;
 
