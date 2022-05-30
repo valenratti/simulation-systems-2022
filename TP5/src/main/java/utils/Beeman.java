@@ -5,6 +5,7 @@ import model.Particle;
 import model.Wall;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class Beeman {
     private double dt;
@@ -41,10 +42,10 @@ public class Beeman {
         System.out.println(rxNext - particle.getX());
         System.out.println(ryNext - particle.getY());
         if(rxNext - particle.getX() >= 0.1){
-            System.out.println("here");
+            System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
         }
         if(ryNext - particle.getY() >= 0.1){
-            System.out.println("here");
+            System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
         }
 
         double auxVx = vx, auxVy = vy;

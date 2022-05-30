@@ -6,6 +6,7 @@ import model.Wall;
 import utils.Vector;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GranularMedia implements ForceCalculator {
     private double kn;
@@ -25,10 +26,10 @@ public class GranularMedia implements ForceCalculator {
         double forceX = 0d, forceY = 0d, pressure = 0d;
         for(Particle neighbour : neighbours) {
             double distance = particle.getDistance(neighbour);
-            double normalizedXDistance = (particle.getX() - neighbour.getX()) / distance;
-            double normalizedYDistance = (particle.getY() - neighbour.getY()) / distance;
-
-            Vector tangencial = new Vector(normalizedYDistance, -normalizedXDistance);
+            double normalizedXDistance = (neighbour.getX() -particle.getX()) / distance;
+            double normalizedYDistance = (neighbour.getY() - particle.getY()) / distance;
+            Vector normal = new Vector(normalizedXDistance, normalizedYDistance);
+            Vector tangencial = new Vector(-normalizedYDistance, normalizedXDistance);
             double overlapSize = particle.getOverlap(neighbour);
             if(overlapSize < 0) continue;
             double relativeVelocity = particle.getRelativeVelocity(neighbour , tangencial);
@@ -41,16 +42,16 @@ public class GranularMedia implements ForceCalculator {
             forceY += normalForceValue * normalizedYDistance + tangencialForceValue * normalizedXDistance;
             pressure += normalForceValue;
             if(Math.abs(forceX) >= 20 || Math.abs(forceY) >= 20){
-                System.out.println("test");
+                System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
             }
         }
         Vector force = new Vector(forceX, forceY);
 
-
+        //Force caused by interaction with walls
         for (Wall wall : walls){
             double overlapSize = overlapSize(particle, wall);
             if (overlapSize > 0){
-                double relativeVelocity = getRelativeVelocity(particle, wall);
+                double relativeVelocity = getTangencialRelativeVelocity(particle, wall);
                 Vector normalAndTanForce = getNormalAndTangencialForce(overlapSize, relativeVelocity);
                 force = addForceFromWall(force, wall, normalAndTanForce);
             }
@@ -58,25 +59,25 @@ public class GranularMedia implements ForceCalculator {
 
         particle.setPressure(Math.abs(pressure)/(2*Math.PI*particle.getRadius()));
 
-
+        //Finally add gravity
         force = force.add(new Vector(0d, 9.8*particle.getMass()));
         if(force.getX() >= 1000 || force.getY() >= 1000){
-            System.out.println("test");
+            System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
         }
         return force;
     }
 
-    private double getRelativeVelocity(Particle particle, Wall wall) {
+    private double getTangencialRelativeVelocity(Particle particle, Wall wall) {
         //Tangencial
         switch (wall.getTypeOfWall()){
             case TOP:
                 return particle.getVelocity().getX();
             case RIGHT:
-                return particle.getVelocity().getY();
+                return -particle.getVelocity().getY();
             case BOTTOM:
                 return -particle.getVelocity().getX();
             case LEFT:
-                return -particle.getVelocity().getY();
+                return particle.getVelocity().getY();
         }
         return 0d;
     }
@@ -104,7 +105,7 @@ public class GranularMedia implements ForceCalculator {
 
     private Vector addForceFromWall(Vector force, Wall wall, Vector normalAndTan){
         switch (wall.getTypeOfWall()){
-            case TOP: // normal [0,1] ; tan [1,0]
+            case TOP: // normal [0,-1] ; tan [1,0]
                 return force.add(new Vector(
                         normalAndTan.getY(),    // Only tan
                         -normalAndTan.getX()     // Only normal
@@ -112,9 +113,9 @@ public class GranularMedia implements ForceCalculator {
             case RIGHT: // normal [1,0] ; tan [0,-1]
                 return force.add(new Vector(
                         normalAndTan.getX(),
-                        normalAndTan.getY()
+                        -normalAndTan.getY()
                 ));
-            case BOTTOM: // normal [0,-1] ; tan [-1,0]
+            case BOTTOM: // normal [0,1] ; tan [-1,0]
                 return force.add(new Vector(
                         -normalAndTan.getY(),
                         normalAndTan.getX()
@@ -122,7 +123,7 @@ public class GranularMedia implements ForceCalculator {
             case LEFT: // normal [-1,0] ; tan [0,1]
                 return force.add(new Vector(
                         -normalAndTan.getX(),
-                        -normalAndTan.getY()
+                        normalAndTan.getY()
                 ));
         }
         return force;

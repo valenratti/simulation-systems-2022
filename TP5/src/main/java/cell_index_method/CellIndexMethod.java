@@ -86,7 +86,7 @@ public class CellIndexMethod {
                 for(Cell neighbourCell : neighbourCells) {
                     List<Particle> neighbours = neighbourCell.getParticleList()
                             .stream().filter(current -> !current.equals(particle))
-                            .filter((current) -> Particle.distance(particle, current, area.getHeight()) < area.getRc()) // TODO: pending refactor
+                            .filter((current) -> Particle.distance(particle, current, area.getHeight()) <= area.getRc()) // TODO: pending refactor
                             .collect(Collectors.toList());
 
                     neighbours.forEach((neighbour) -> {

@@ -57,10 +57,10 @@ public class Simulator {
 
 
             aux++;
-//            if(aux == 500) {
+            if(aux == 300) {
                 FileWriter.printPositions(particleList);
                 aux = 0;
-//            }
+            }
             cellIndexMethod.clear();
         }
 
