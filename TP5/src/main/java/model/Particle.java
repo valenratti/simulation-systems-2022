@@ -32,10 +32,6 @@ public class Particle {
         this.ay = 0;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Vector getPosition(){
         return new Vector(this.x, this.y);
     }

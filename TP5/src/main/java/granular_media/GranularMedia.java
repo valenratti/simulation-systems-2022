@@ -60,8 +60,8 @@ public class GranularMedia implements ForceCalculator {
         particle.setPressure(Math.abs(pressure)/(2*Math.PI*particle.getRadius()));
 
         //Finally add gravity
-        force = force.add(new Vector(0d, 9.8*particle.getMass()));
-        if(force.getX() >= 1000 || force.getY() >= 1000){
+        force = force.add(new Vector(0d, -9.8*particle.getMass()));
+        if(force.getX() >= 10 || force.getY() >= 10){
             System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
         }
         return force;
@@ -108,7 +108,7 @@ public class GranularMedia implements ForceCalculator {
             case TOP: // normal [0,-1] ; tan [1,0]
                 return force.add(new Vector(
                         normalAndTan.getY(),    // Only tan
-                        -normalAndTan.getX()     // Only normal
+                        normalAndTan.getX()     // Only normal
                 ));
             case RIGHT: // normal [1,0] ; tan [0,-1]
                 return force.add(new Vector(
@@ -118,7 +118,7 @@ public class GranularMedia implements ForceCalculator {
             case BOTTOM: // normal [0,1] ; tan [-1,0]
                 return force.add(new Vector(
                         -normalAndTan.getY(),
-                        normalAndTan.getX()
+                        -normalAndTan.getX()
                 ));
             case LEFT: // normal [-1,0] ; tan [0,1]
                 return force.add(new Vector(

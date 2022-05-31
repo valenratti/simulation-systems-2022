@@ -16,7 +16,7 @@ public class Simulator {
 
     public static void simulate(final CIMConfig config, final double dt, final double dt2) throws IOException {
         CellIndexMethod cellIndexMethod = new CellIndexMethod(config);
-        double kn = 10e+5, kt = 2*kn, boxWidth = config.getAreaWidth(), boxHeight = config.getAreaHeight();
+        double kn = 1e+5, kt = 2*kn, boxWidth = config.getAreaWidth(), boxHeight = config.getAreaHeight();
         Beeman beeman = new Beeman(dt, true, new GranularMedia(kn, kt, boxWidth, boxHeight));
 
         List<Particle> particleList = cellIndexMethod.getArea().getParticleList();
@@ -43,7 +43,7 @@ public class Simulator {
             particleList.forEach((particle) -> {
                 beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()),
                         getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
-                if(particle.getY() >= boxHeight + config.getHeightBelowExit()){
+                if(particle.getY() <= -config.getHeightBelowExit()) {
                     // TODO: reset particles L/10 below exit
                     // TODO: caudal = nro de particulas que salieron en dt / dt
                     caudal.getAndIncrement();
@@ -76,7 +76,7 @@ public class Simulator {
         double y;
         do{
             x = ThreadLocalRandom.current().nextDouble(config.getMaxParticleRadius(),config.getAreaWidth()-config.getMaxParticleRadius());
-            y = ThreadLocalRandom.current().nextDouble( 0, config.getAreaHeight()/3 + config.getMaxParticleRadius());
+            y = ThreadLocalRandom.current().nextDouble(config.getAreaHeight()*2/3 + config.getMaxParticleRadius(), config.getAreaHeight() - config.getMaxParticleRadius());
         }while (noOverlapParticle(x,y,particle.getRadius(), particles));  //NO NEED TO CHECK WALLS?
         particle.setX(x);
         particle.setY(y);

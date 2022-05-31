@@ -30,7 +30,7 @@ public class CellIndexMethod {
         this.cellsPerColumn = calculateCellsPerColumn();
         this.cellMap = new HashMap<>();
 
-        for(int i = 0; i < cellsPerColumn; i++)
+        for(int i = cellsPerColumn - 1; i >= 0; i--)
             for(int j = 0; j < cellsPerRow; j++)
                 cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
 
@@ -40,7 +40,7 @@ public class CellIndexMethod {
         int extraCells = (int) Math.floor(config.getHeightBelowExit() / config.getMaxParticleRadius() * 2);
         extraCells = extraCells == 0 ? 1 : extraCells;
 
-        for(int i = cellsPerColumn; i < cellsPerColumn + extraCells; i++)
+        for(int i = -1; -i <= extraCells; i--)
             for(int j = 0; j < cellsPerRow; j++)
                 cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
 
