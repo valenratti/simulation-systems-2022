@@ -167,7 +167,9 @@ public class CellIndexMethod {
             int column = (int) Math.floor(particle.getX() / this.cellSideLength);
             try {
                 if (row >= 0 && row <= cellsPerColumn && column >= 0 && column <= cellsPerRow) {
-                    cellMap.get(new CellCoordinates(row, column)).addParticle(particle);
+                    Cell cell = cellMap.get(new CellCoordinates(row, column));
+                    cell.addParticle(particle);
+                    particle.setCell(cell);
                     currentOccupiedCells.add(new CellCoordinates(row, column));
                 }
             } catch (Exception e){

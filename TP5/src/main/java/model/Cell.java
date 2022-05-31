@@ -15,6 +15,9 @@ public class Cell {
     }
 
     public void addParticle(Particle particle){
+        if(!particle.getCell().equals(this))
+            throw new RuntimeException("Particle cell differs from current cell");
+
         this.particleList.add(particle);
     }
 
