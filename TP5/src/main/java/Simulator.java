@@ -57,7 +57,7 @@ public class Simulator {
 
 
             aux++;
-            if(aux == 300) {
+            if(aux == 500) {
                 FileWriter.printPositions(particleList);
                 aux = 0;
             }

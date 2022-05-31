@@ -2,6 +2,8 @@ package model;
 
 import utils.Vector;
 
+import java.util.Objects;
+
 public class Particle {
     private static Long currentId = 0L;
 
@@ -149,7 +151,7 @@ public class Particle {
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return Objects.hash(id);
     }
 
     @Override
