@@ -30,19 +30,11 @@ public class CellIndexMethod {
         this.cellsPerColumn = calculateCellsPerColumn();
         this.cellMap = new HashMap<>();
 
-        List<Particle> particleList = new ArrayList<>();
-        Particle particle;
-        int counter = 0, N = config.getTotalParticles();
-
         for(int i = 0; i < cellsPerColumn; i++)
-            for(int j = 0; j < cellsPerRow; j++) {
+            for(int j = 0; j < cellsPerRow; j++)
                 cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
-                if(counter++ < N) {
-                    particle = generateParticle(i, j);
-                    addParticleToCell(particle, i, j);
-                    particleList.add(particle);
-                }
-            }
+
+        List<Particle> particleList = spawnParticles();
 
         // extra space after exit --> L / 10
         int extraCells = (int) Math.floor(config.getHeightBelowExit() / config.getMaxParticleRadius() * 2);
@@ -53,6 +45,26 @@ public class CellIndexMethod {
                 cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
 
         this.area = new Area(config.getAreaWidth(), config.getAreaHeight(), config.getExitWidth(), particleList);
+    }
+
+    private List<Particle> spawnParticles() {
+        List<Particle> particleList = new ArrayList<>();
+        Particle particle;
+        int N = config.getTotalParticles();
+        List<CellCoordinates> keys = new ArrayList<>(cellMap.keySet());
+        Collections.shuffle(keys);
+        CellCoordinates cellCoordinates;
+
+        for(int i = 0, x, y; i < N && i < keys.size(); i++) {
+            cellCoordinates = keys.get(i);
+            x = cellCoordinates.getRow();
+            y = cellCoordinates.getColumn();
+            particle = generateParticle(x, y);
+            addParticleToCell(particle, x, y);
+            particleList.add(particle);
+        }
+
+        return particleList;
     }
 
     private Particle generateParticle(double i, double j) {
