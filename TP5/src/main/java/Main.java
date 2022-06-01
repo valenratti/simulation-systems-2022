@@ -16,7 +16,7 @@ public class Main {
         final CIMConfig config = new CIMConfig(L, W, D, N, minRadius, maxRadius, m, L / 10);
 
         // dt de referencia --> dt = 0.1 * sqrt(m / kn)
-        double dt = 1e-4, dt2 =1e-2;
+        double dt = 1e-5/3, dt2 =1e-2;
 //        dt = 0.1 * Math.sqrt(m / 1e5);
 
         Simulator.simulate(config, dt, dt2);

@@ -19,6 +19,7 @@ public class Particle {
     private double ay; //acceleration y
     private double pressure;
     private Cell cell;
+    private boolean isFixed;
 
     public Particle(double x, double y, double vx, double vy, double mass, double radius, boolean idDisposable) {
         this.id = idDisposable ? null : currentId++;
@@ -30,7 +31,23 @@ public class Particle {
         this.mass = mass;
         this.ax = 0;
         this.ay = 0;
+        this.isFixed = false;
     }
+
+    public Particle(double x, double y, double vx, double vy, double mass, double radius, boolean idDisposable, boolean isFixed) {
+        this.id = idDisposable ? null : currentId++;
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.vx = vx;
+        this.vy = vy;
+        this.mass = mass;
+        this.ax = 0;
+        this.ay = 0;
+        this.isFixed = isFixed;
+    }
+
+
 
     public Vector getPosition(){
         return new Vector(this.x, this.y);
@@ -148,6 +165,10 @@ public class Particle {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    public boolean isFixed() {
+        return isFixed;
     }
 
     @Override

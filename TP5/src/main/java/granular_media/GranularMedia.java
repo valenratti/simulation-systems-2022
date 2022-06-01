@@ -24,6 +24,7 @@ public class GranularMedia implements ForceCalculator {
     @Override
     public Vector getForceAppliedOnParticle(Particle particle, List<Particle> neighbours, List<Wall> walls){
         double forceX = 0d, forceY = 0d, pressure = 0d;
+        neighbours = neighbours.stream().distinct().collect(Collectors.toList());
         for(Particle neighbour : neighbours) {
             double distance = particle.getDistance(neighbour);
             double normalizedXDistance = (neighbour.getX() -particle.getX()) / distance;
@@ -31,6 +32,9 @@ public class GranularMedia implements ForceCalculator {
             Vector normal = new Vector(normalizedXDistance, normalizedYDistance);
             Vector tangencial = new Vector(-normalizedYDistance, normalizedXDistance);
             double overlapSize = particle.getOverlap(neighbour);
+            if(overlapSize >= 0.015){
+                System.out.println("here");
+            }
             if(overlapSize < 0) continue;
             double relativeVelocity = particle.getRelativeVelocity(neighbour , tangencial);
             double normalForceValue = - kn * overlapSize;
@@ -50,6 +54,9 @@ public class GranularMedia implements ForceCalculator {
         //Force caused by interaction with walls
         for (Wall wall : walls){
             double overlapSize = overlapSize(particle, wall);
+            if(overlapSize >= 2*0.015){
+                System.out.println("here");
+            }
             if (overlapSize > 0){
                 double relativeVelocity = getTangencialRelativeVelocity(particle, wall);
                 Vector normalAndTanForce = getNormalAndTangencialForce(overlapSize, relativeVelocity);
@@ -89,7 +96,7 @@ public class GranularMedia implements ForceCalculator {
             case RIGHT:
                 return p.getX() + p.getRadius() - boxWidth;
             case BOTTOM:
-                return p.getY() + p.getRadius() - boxHeight;
+                return p.getRadius() - p.getY();
             case LEFT:
                 return p.getRadius() - p.getX();
         }

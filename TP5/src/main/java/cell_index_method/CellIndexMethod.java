@@ -34,7 +34,7 @@ public class CellIndexMethod {
             for(int j = 0; j < cellsPerRow; j++)
                 cellMap.put(new CellCoordinates(i, j), new Cell(i, j, new ArrayList<>()));
 
-        List<Particle> particleList = spawnParticles();
+        List<Particle> particleList = spawnParticles(config);
 
         // extra space after exit --> L / 10
         int extraCells = (int) Math.floor(config.getHeightBelowExit() / config.getMaxParticleRadius() * 2);
@@ -47,7 +47,7 @@ public class CellIndexMethod {
         this.area = new Area(config.getAreaWidth(), config.getAreaHeight(), config.getExitWidth(), particleList);
     }
 
-    private List<Particle> spawnParticles() {
+    private List<Particle> spawnParticles(CIMConfig config) {
         List<Particle> particleList = new ArrayList<>();
         Particle particle;
         int N = config.getTotalParticles();
@@ -63,7 +63,12 @@ public class CellIndexMethod {
             addParticleToCell(particle, x, y);
             particleList.add(particle);
         }
-
+        particleList.add(new Particle(0d,0d,0d, 0d, 0.00001, 0.00001, false,true));
+        particleList.add(new Particle(config.getAreaWidth(),0d,0d, 0d, 0.00001, 0.00001, false,true));
+        particleList.add(new Particle(0,config.getAreaHeight(),0d, 0d, 0.00001, 0.00001, false,true));
+        particleList.add(new Particle(config.getAreaWidth(),config.getAreaHeight(),0d, 0d, 0.00001, 0.00001, false,true));
+        particleList.add(new Particle(config.getAreaWidth()/2 + (config.getExitWidth() / 2),0,0d, 0d, 0.00001, 0.00001, false,true));
+        particleList.add(new Particle(config.getAreaWidth()/2 - (config.getExitWidth() / 2), 0,0d, 0d, 0.00001, 0.00001, false,true));
         return particleList;
     }
 
@@ -97,7 +102,8 @@ public class CellIndexMethod {
                 List<Particle> currentParticleNeighbours = neighboursMap.getOrDefault(particle, new ArrayList<>());
                 for(Cell neighbourCell : neighbourCells) {
                     List<Particle> neighbours = neighbourCell.getParticleList()
-                            .stream().filter(current -> !current.equals(particle))
+                            .stream().filter((current) -> !particle.isFixed())
+                            .filter(current -> !current.equals(particle))
                             .filter((current) -> Particle.distance(particle, current, area.getHeight()) <= area.getRc()) // TODO: pending refactor
                             .collect(Collectors.toList())
                             .stream().distinct().collect(Collectors.toList());
@@ -162,14 +168,14 @@ public class CellIndexMethod {
      */
     public void updateParticles(List<Particle> particles){
         Set<CellCoordinates> currentOccupiedCells = new HashSet<>();
-        for(Particle particle : particles) {
+        for(Particle particle : particles.stream().filter(particle -> !particle.isFixed()).collect(Collectors.toList())) {
             int row = (int) Math.floor(particle.getY() / this.cellSideLength);
             int column = (int) Math.floor(particle.getX() / this.cellSideLength);
             try {
-                if (row >= 0 && row <= cellsPerColumn && column >= 0 && column <= cellsPerRow) {
+                if (row >= 0 && row < cellsPerColumn && column >= 0 && column < cellsPerRow) {
                     Cell cell = cellMap.get(new CellCoordinates(row, column));
-                    cell.addParticle(particle);
                     particle.setCell(cell);
+                    cell.addParticle(particle);
                     currentOccupiedCells.add(new CellCoordinates(row, column));
                 }
             } catch (Exception e){

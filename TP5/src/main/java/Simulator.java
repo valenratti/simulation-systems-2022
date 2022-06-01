@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 public class Simulator {
 
@@ -40,7 +41,7 @@ public class Simulator {
             }
             time += dt;
             Map<Particle, List<Particle>> neighboursMap = cellIndexMethod.calculateNeighbours();
-            particleList.forEach((particle) -> {
+            particleList.stream().filter(particle -> !particle.isFixed()).forEach((particle) -> {
                 beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()),
                         getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
                 if(particle.getY() <= -config.getHeightBelowExit()) {
@@ -76,8 +77,8 @@ public class Simulator {
         double y;
         do{
             x = ThreadLocalRandom.current().nextDouble(config.getMaxParticleRadius(),config.getAreaWidth()-config.getMaxParticleRadius());
-            y = ThreadLocalRandom.current().nextDouble(config.getAreaHeight()*2/3 + config.getMaxParticleRadius(), config.getAreaHeight() - config.getMaxParticleRadius());
-        }while (noOverlapParticle(x,y,particle.getRadius(), particles));  //NO NEED TO CHECK WALLS?
+            y = ThreadLocalRandom.current().nextDouble(config.getAreaHeight() / 3 + config.getMaxParticleRadius(), config.getAreaHeight() - config.getMaxParticleRadius());
+        }while (overlapParticle(x,y,particle.getRadius(), particles));  //NO NEED TO CHECK WALLS?
         particle.setX(x);
         particle.setY(y);
         particle.setVx(0d);
@@ -85,14 +86,15 @@ public class Simulator {
         particle.setPressure(0d);
     }
 
-    private static boolean noOverlapParticle(double x, double y, double radius, List<Particle> particles) {
+    private static boolean overlapParticle(double x, double y, double radius, List<Particle> particles) {
         if (particles.size() == 0) return true;
-        for (Particle particle : particles){
-            if ( (Math.pow(particle.getX() - x, 2) + Math.pow(particle.getY() - y, 2)) <= Math.pow(particle.getRadius() + radius, 2)){
-                return false;
+        Particle aux = new Particle(x, y, 0d, 0d, 0d, radius, true);
+        for (Particle particle : particles.stream().filter(particle -> !particle.isFixed()).collect(Collectors.toList())){
+            if(aux.getOverlap(particle) > 0){
+                return true;
             }
         }
-        return true;
+        return false;
     }
 
     private static List<Wall> getWallsCollisions(Particle p, Double boxWidth, Double boxHeight, Double D){
@@ -101,7 +103,7 @@ public class Simulator {
             walls.add(new Wall(Wall.typeOfWall.LEFT));
         if (boxWidth - p.getX() < p.getRadius())
             walls.add(new Wall(Wall.typeOfWall.RIGHT));
-        if (boxHeight - p.getY() < p.getRadius())
+        if (p.getY() < p.getRadius() && p.getY()>0)
             if(p.getX() < boxWidth / 2 - D / 2  || p.getX() > boxWidth / 2 + D / 2 )
                 walls.add(new Wall(Wall.typeOfWall.BOTTOM));
         return walls;

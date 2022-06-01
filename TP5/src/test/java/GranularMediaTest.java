@@ -63,7 +63,7 @@ public class GranularMediaTest {
         final double D = 0.15;  // D en [0.15, 0.25] m
 
         final double minRadius = 0.01, maxRadius = 0.015;   // r en [0.01, 0.015] m
-        final int N = 70;  // number of particles TBD
+        final int N = 150;  // number of particles TBD
         final double m = 0.01;  // kg
 
         final CIMConfig config = new CIMConfig(L, W, D, N, minRadius, maxRadius, m, L / 10);
