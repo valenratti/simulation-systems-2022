@@ -25,7 +25,7 @@ def mean_and_stdev(Ds, mean_list, stdev_list):
     plt.errorbar(Ds, mean_list, stdev_list, linestyle='None', marker='o')
 
     plt.xlabel('Apertura D [m]')
-    # plt.ylabel('Caudal')
+    plt.ylabel('Caudal promedio [partículas/s]')
     plt.title('Valor medio y desviación estándar del caudal')
     plt.xticks(Ds)
 
