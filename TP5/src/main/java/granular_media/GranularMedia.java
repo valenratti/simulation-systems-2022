@@ -22,7 +22,7 @@ public class GranularMedia implements ForceCalculator {
     }
 
     @Override
-    public Vector getForceAppliedOnParticle(Particle particle, List<Particle> neighbours, List<Wall> walls){
+    public Vector getForceAppliedOnParticle(Particle particle, List<Particle> neighbours, List<Wall> walls) throws ForceException {
         double forceX = 0d, forceY = 0d, pressure = 0d;
         neighbours = neighbours.stream().distinct().collect(Collectors.toList());
         for(Particle neighbour : neighbours) {
@@ -34,6 +34,7 @@ public class GranularMedia implements ForceCalculator {
             double overlapSize = particle.getOverlap(neighbour);
             if(overlapSize >= 0.015){
                 System.out.println("here");
+                throw new ForceException();
             }
             if(overlapSize < 0) continue;
             double relativeVelocity = particle.getRelativeVelocity(neighbour , tangencial);
@@ -45,9 +46,9 @@ public class GranularMedia implements ForceCalculator {
             //Fy = FN eny + FT ( enx)
             forceY += normalForceValue * normalizedYDistance + tangencialForceValue * normalizedXDistance;
             pressure += normalForceValue;
-            if(Math.abs(forceX) >= 20 || Math.abs(forceY) >= 20){
-                System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
-            }
+//            if(Math.abs(forceX) >= 20 || Math.abs(forceY) >= 20){
+//                System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
+//            }
         }
         Vector force = new Vector(forceX, forceY);
 
@@ -55,7 +56,8 @@ public class GranularMedia implements ForceCalculator {
         for (Wall wall : walls){
             double overlapSize = overlapSize(particle, wall);
             if(overlapSize >= 2*0.015){
-                System.out.println("here");
+//                System.out.println("here");
+                throw new ForceException();
             }
             if (overlapSize > 0){
                 double relativeVelocity = getTangencialRelativeVelocity(particle, wall);
@@ -68,9 +70,9 @@ public class GranularMedia implements ForceCalculator {
 
         //Finally add gravity
         force = force.add(new Vector(0d, -9.8*particle.getMass()));
-        if(force.getX() >= 10 || force.getY() >= 10){
+        /*if(force.getX() >= 10 || force.getY() >= 10){
             System.out.println("Error with particle " + particle.getId() + "neighbours " + neighbours.stream().map(Particle::getId).collect(Collectors.toList()) + " walls" + walls.stream().map(Wall::getTypeOfWall).collect(Collectors.toList()));
-        }
+        }*/
         return force;
     }
 

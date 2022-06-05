@@ -180,7 +180,7 @@ public class CellIndexMethod {
                 }
             } catch (Exception e){
                 try {
-                    FileWriter.printPositions(particles);
+                    FileWriter.printPositions(0,particles);
                 }catch (IOException ex){
                     System.out.println(ex.getMessage());
                 }

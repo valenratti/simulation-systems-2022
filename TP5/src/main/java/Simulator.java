@@ -1,75 +1,125 @@
 import cell_index_method.CIMConfig;
 import cell_index_method.CellIndexMethod;
+import granular_media.ForceException;
 import granular_media.GranularMedia;
 import model.Particle;
 import model.Wall;
 import utils.Beeman;
 import utils.FileWriter;
 import utils.Utils;
+import utils.Vector;
 
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class Simulator {
 
-    public static void simulate(final CIMConfig config, final double dt, final double dt2) throws IOException {
+    public static void simulate(final CIMConfig config, final double dt, final double dt2, final double kn, final double kt) throws IOException {
         CellIndexMethod cellIndexMethod = new CellIndexMethod(config);
-        double kn = 1e+5, kt = 2*kn, boxWidth = config.getAreaWidth(), boxHeight = config.getAreaHeight();
+        double boxWidth = config.getAreaWidth(), boxHeight = config.getAreaHeight();
+        int caudal = 0;
+        double slidingWindow = 0.0;
+//        int slidingWindowBySteps = (int) Math.floor(slidingWindow / dt);
+//        int dtCaudalInteger = slidingWindowBySteps / 10;
+//        List<Integer> caudalsBySlidingWindow = new ArrayList<>();
+        List<Vector> caudalList = new ArrayList<>();
+        List<Double> caudalTimes = new ArrayList<>();
         Beeman beeman = new Beeman(dt, true, new GranularMedia(kn, kt, boxWidth, boxHeight));
 
         List<Particle> particleList = cellIndexMethod.getArea().getParticleList();
 
-        List<Double> flowList = new ArrayList<>(); // TODO: "sliding window"?
-        boolean flowStabilized = false;
+        AtomicBoolean flowStabilized = new AtomicBoolean(false);
 
-        List<Double> energies = new ArrayList<>(); // time unit --> seconds
+        List<Vector> energies = new ArrayList<>(); // time unit --> seconds
 
         double time = 0.0;
-        AtomicInteger caudal = new AtomicInteger();
-        int aux = 0;    // aux = (time % dt2) / dt  <--> aux * dt = time + k * dt2
+        int printAux = 0;
+        int slidingWindowAux = 0;
         final double logStep = dt2 / dt;    // dt2 = logStep * dt
 
         // TODO: log initial state
-        FileWriter.printPositions(particleList);
-
-        while(!flowStabilized) {
+        FileWriter.printPositions(config.getExitWidth(), particleList);
+        boolean error = false;
+        while(time<=5.0 && !error) {
             if(time != 0.0) {
                 cellIndexMethod.updateParticles(particleList);
             }
             time += dt;
             Map<Particle, List<Particle>> neighboursMap = cellIndexMethod.calculateNeighbours();
-            particleList.stream().filter(particle -> !particle.isFixed()).forEach((particle) -> {
-                beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()),
-                        getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
+
+            for(Particle particle : particleList.stream().filter(particle -> !particle.isFixed()).collect(Collectors.toList())){
+                try {
+                    beeman.nextStep(particle, neighboursMap.getOrDefault(particle, new ArrayList<>()),
+                            getWallsCollisions(particle, boxWidth, boxHeight, config.getExitWidth()));
+                } catch (ForceException e) {
+                    error = true;
+                    break;
+                }
                 if(particle.getY() <= -config.getHeightBelowExit()) {
                     // TODO: reset particles L/10 below exit
                     // TODO: caudal = nro de particulas que salieron en dt / dt
-                    caudal.getAndIncrement();
+                    if(++caudal == 50){
+                        slidingWindow = time;
+                    }
+                    if(caudal >= 50){
+                        if(caudal == 50){
+                            slidingWindow = time;
+                        }else {
+                            slidingWindow = time - caudalTimes.get(0);
+                        }
+                        caudalList.add(new Vector(time, 50 / slidingWindow));
+                        caudalTimes.remove(0);
+                        if(caudal > 50) {
+                            if (Math.abs(caudalList.get(caudalList.size() - 1).getY() - caudalList.get(caudalList.size() - 2).getY()) <= 0.5) {
+                                flowStabilized.set(true);
+                            }
+                        }
+                    }
+                    caudalTimes.add(time);
                     resetParticle(particle, config, particleList);
                 }
-            });
+            }
 
-            energies.add(Utils.calculateSystemKineticEnergy(particleList));
+
+            energies.add(new Vector(time, Utils.calculateSystemKineticEnergy(particleList)));
 
             // TODO: update flowStabilized if appropriate
 
 
-            aux++;
-            if(aux == 500) {
-                FileWriter.printPositions(particleList);
-                aux = 0;
+            printAux++;
+            if(printAux == 500) {
+                FileWriter.printPositions(config.getExitWidth(), particleList);
+                printAux = 0;
             }
+
+//            slidingWindowAux++;
+//            if(slidingWindowAux % dtCaudalInteger == 0){
+//                caudalsBySlidingWindow.add(caudal.get());
+//                caudal.set(0);
+//            }
+//            if(slidingWindowAux >= slidingWindowBySteps && slidingWindowAux % dtCaudalInteger == 0){
+//                int totalCaudal = caudalsBySlidingWindow.subList(caudalsBySlidingWindow.size() - (slidingWindowBySteps / dtCaudalInteger),
+//                        caudalsBySlidingWindow.size()).stream().mapToInt(Integer::intValue).sum();
+//
+//                caudalList.add((double) totalCaudal / slidingWindow);
+//            }
+
+
             cellIndexMethod.clear();
         }
-
+        FileWriter.reset();
         // TODO: Beverloo
 
         // TODO: valor medio y desv estandar del caudal
         // TODO: print time vs flow
         // TODO: print time vs kinetic energy
+        FileWriter.printCaudal(config.getExitWidth(),caudalList, slidingWindow);
+        FileWriter.printEnergies(config.getExitWidth(), energies, kt);
     }
 
     private static void resetParticle(Particle particle, CIMConfig config, List<Particle> particles) {
