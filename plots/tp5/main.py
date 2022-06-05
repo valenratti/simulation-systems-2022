@@ -58,27 +58,33 @@ def ej2():
 
     best_c = 0
     min_error = float('inf')
+    square_error = 0
+    square_error_list = []
+    c_list = [c/10 for c in range(10, 36)]
 
     # finding best_c for all Ds
-    for c2 in range(12, 30):
-        c2 = c2 / 10
-        error_sum = 0
+    for c2 in c_list:
+        square_error = 0
         for i in range(len(Ds)):
             Q = beverloo_formula(Ds[i], c2)
-            error_sum += abs(Q - mean_list[i]) / mean_list[i]
-        if error_sum < min_error:
-            min_error = error_sum
+            square_error += pow(mean_list[i] - Q, 2)
+
+        square_error_list.append(square_error)
+        if square_error < min_error:
+            min_error = square_error
             best_c = c2
 
     beverloo_flows = [beverloo_formula(D, best_c) for D in Ds]
 
-    print(best_c)
+    print(f'c: {best_c}, error cuadratico: {min_error}')
 
     for i in range(len(Ds)):
         print(f'Q: {mean_list[i]}, bev: {beverloo_flows[i]}')
 
-    plots.mean_and_stdev(Ds, mean_list, stdev_list, f'Ajuste del parámetro libre de la ley de Beverloo - C = {best_c}',
-                         'Apertura D [m]', 'Caudal [partículas/s]', beverloo=True, beveerloo_flows=beverloo_flows)
+    plots.mean_and_stdev(Ds, mean_list, stdev_list, title=f'Ajuste del parámetro libre de la ley de Beverloo',
+                         xlabel='Apertura D [m]', ylabel='Caudal [partículas/s]',
+                         suptitle=f'C = {best_c}', beverloo=True, beveerloo_flows=beverloo_flows)
+    plots.mse(c_list, square_error_list, best_c, min_error)
 
 
 def beverloo(d, mean):
@@ -135,7 +141,7 @@ def ej4():
     ej_path = tp5_path + "ej4/"
     col_names = ['time', ' energy']
 
-    kt_list = [100000, 200000, 300000]
+    kt_list = [100000, 300000, 500000, 1000000]
     times = []
     energies = []
 
@@ -157,10 +163,11 @@ def ej4():
         e_mean_list.append(np.mean(trimmed_energies[j]))
         e_stdev_list.append(np.std(trimmed_energies[j]))
 
-    plots.time_vs_sth(kt_list, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
-                      'Parametro de fricción [N/m]', suptitle=f'D = 0', log_scale=True)
-    plots.mean_and_stdev(kt_list, e_mean_list, e_stdev_list, 'Energía residual en función del parámetro de fricción',
-                         'Parámetro de fricción [N/m]', 'Energía residual promedio [J]')
+    plots.time_vs_sth(kt_list, times, energies, 'Energía [J]', 'D = 0', 'Parametro de fricción [N/m]',
+                      suptitle='Evolución temporal de la energía cinética', log_scale=True)
+    plots.mean_and_stdev(kt_list, e_mean_list, e_stdev_list,
+                         'Energía residual promedio en función del parámetro de fricción',
+                         'Parámetro de fricción [N/m]', 'Energía [J]')
 
 
 # Press the green button in the gutter to run the script.
