@@ -36,7 +36,8 @@ def ej1():
         stdev_list.append(np.std(flow))
 
     plots.time_vs_sth(Ds, times, flows, 'Caudal [partículas/s]', 'Evolución temporal del caudal', 'Apertura D [m]')
-    plots.mean_and_stdev(Ds, mean_list, stdev_list, 'Valor medio y desviación estándar del caudal')
+    plots.mean_and_stdev(Ds, mean_list, stdev_list, 'Valor medio y desviación estándar del caudal',
+                         'Apertura D [m]', 'Caudal [partículas/s]')
 
     return mean_list, stdev_list
 
@@ -55,25 +56,39 @@ def ej2():
               f'mean = {mean:.3f}, Q = {Q:.3f}, c = {c}, relative error = {error / mean:.3f}, '
               f'percentage error = {error / mean * 100:.3f} %\n')
 
-    plots.mean_and_stdev(Ds, mean_list, stdev_list, 'Ajuste del parámetro libre de la ley de Beverloo',
-                         beverloo=True, beveerloo_flows=beverloo_flows)
+    best_c = 0
+    min_error = float('inf')
+
+    # finding best_c for all Ds
+    for c2 in range(12, 30):
+        c2 = c2 / 10
+        error_sum = 0
+        for i in range(len(Ds)):
+            Q = beverloo_formula(Ds[i], c2)
+            error_sum += abs(Q - mean_list[i]) / mean_list[i]
+        if error_sum < min_error:
+            min_error = error_sum
+            best_c = c2
+
+    beverloo_flows = [beverloo_formula(D, best_c) for D in Ds]
+
+    print(best_c)
+
+    for i in range(len(Ds)):
+        print(f'Q: {mean_list[i]}, bev: {beverloo_flows[i]}')
+
+    plots.mean_and_stdev(Ds, mean_list, stdev_list, f'Ajuste del parámetro libre de la ley de Beverloo - C = {best_c}',
+                         'Apertura D [m]', 'Caudal [partículas/s]', beverloo=True, beveerloo_flows=beverloo_flows)
 
 
 def beverloo(d, mean):
-    n = 10 * 33                 # FIXME: chequear # nro de particulas que entran en el silo
-    area = 1 * 0.3              # FIXME: chequear # area del silo
-    n_p = n / area              # nro de particulas por unidad de volumen
-    g_square_root = 3.13        # raiz de la gravedad
-    r = (0.01 + 0.015) / 2      # radio medio de las particulas
-    exp = 1.5                   # exponente para silo 2D (para 3D es 2.5)
-
     min_error = float('inf')
     best_c = 0
     best_Q = 0
 
     for c in range(50):     # [0, 5]
         c = c / 10          # step 0.1
-        Q = n_p * g_square_root * pow(d - c * r, exp)
+        Q = beverloo_formula(d, c)
         error = abs(Q - mean)
         if error < min_error:
             min_error = error
@@ -81,6 +96,17 @@ def beverloo(d, mean):
             best_Q = Q
 
     return best_Q, best_c, min_error    # lo mas logico seria que c dé entre 0.5 y 2
+
+
+def beverloo_formula(d, c):
+    n = 10 * 33             # FIXME: chequear # nro de particulas que entran en el silo
+    area = 1 * 0.3          # FIXME: chequear # area del silo
+    n_p = n / area          # nro de particulas por unidad de volumen
+    g_square_root = 3.13    # raiz de la gravedad
+    r = (0.01 + 0.015) / 2  # radio medio de las particulas
+    exp = 1.5               # exponente para silo 2D (para 3D es 2.5)
+
+    return n_p * g_square_root * pow(d - c * r, exp)
 
 
 def ej3():
@@ -92,14 +118,16 @@ def ej3():
     energies = []
 
     for D in Ds:
-        lists = read_csv_columns_to_lists(f'{ej_path}energies-{str(D)}.csv', col_names)
+        lists = read_csv_columns_to_lists(f'{ej_path}energies-{str(D)}-200000.0.csv', col_names)
         times.append(lists[0])
         energies.append(lists[1])
+        # if D == 0.22:
+        #     for i in range(len(times[2])):
+        #         if times[2][i] > 3 and energies[2][i] > 6:
+        #             print(f't: {times[2][i]}, e: {energies[2][i]}')
 
     plots.time_vs_sth(Ds, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
-                      'Apertura D [m]', log_scale=True)
-    # plots.time_vs_sth(Ds, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
-    #                   'Apertura D [m]', log_scale=True, zoom=True)
+                      'Apertura D [m]', log_scale=True, ej3=True)
 
 
 def ej4():
@@ -107,7 +135,7 @@ def ej4():
     ej_path = tp5_path + "ej4/"
     col_names = ['time', ' energy']
 
-    kt_list = [200000, 400000, 600000]
+    kt_list = [100000, 200000, 300000]
     times = []
     energies = []
 
@@ -116,18 +144,30 @@ def ej4():
         times.append(lists[0])
         energies.append(lists[1])
 
-    # TODO: energia residual?
+    # energia residual
+    stable_t = 0.44
+    t = next(x for x in times[0] if x >= stable_t)
+    i = times[0].index(t)
+    trimmed_energies = [e[i:] for e in energies]
+
+    e_mean_list = []
+    e_stdev_list = []
+
+    for j in range(len(kt_list)):
+        e_mean_list.append(np.mean(trimmed_energies[j]))
+        e_stdev_list.append(np.std(trimmed_energies[j]))
 
     plots.time_vs_sth(kt_list, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
-                      'Parametro de fricción [N/m]', suptitle=f'D = 0')
-    plots.residual_energy_vs_friction_param()
+                      'Parametro de fricción [N/m]', suptitle=f'D = 0', log_scale=True)
+    plots.mean_and_stdev(kt_list, e_mean_list, e_stdev_list, 'Energía residual en función del parámetro de fricción',
+                         'Parámetro de fricción [N/m]', 'Energía residual promedio [J]')
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    Ds = [0.15, 0.18, 0.22, 0.25]
+    Ds = [0.15, 0.18, 0.22, 0.24]
 
     mean_list, stdev_list = ej1()
     ej2()
-    # ej3()
-    # ej4()
+    ej3()
+    ej4()

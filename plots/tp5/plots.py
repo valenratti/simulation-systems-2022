@@ -2,7 +2,9 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
-def time_vs_sth(labels, times, y_data, y_label, title, legend_title, suptitle=None, log_scale=False, zoom=False):  # energy or flow
+def time_vs_sth(labels, times, y_data, y_label, title, legend_title,
+                suptitle=None, log_scale=False, zoom=False, ej3=False):  # energy or flow
+    # aux = [format(n, '.0e') for n in labels]
     for i in range(len(labels)):
         plt.plot(times[i], y_data[i], label=labels[i])
 
@@ -22,33 +24,25 @@ def time_vs_sth(labels, times, y_data, y_label, title, legend_title, suptitle=No
     plt.show()
 
 
-def mean_and_stdev(Ds, mean_list, stdev_list, title, beverloo=False, beveerloo_flows=None):
-    plt.errorbar(Ds, mean_list, stdev_list, linestyle='None', marker='o')
+def mean_and_stdev(x_data, mean_list, stdev_list, title, xlabel, ylabel, beverloo=False, beveerloo_flows=None):
+    plt.errorbar(x_data, mean_list, stdev_list, linestyle='None', marker='o')
 
     if beverloo:
-        plt.plot(Ds, beveerloo_flows, linestyle='None', marker='o')
-        ret = np.polyfit(Ds, beveerloo_flows, 1)
-        plt.plot(Ds, np.array(ret[0]) * Ds + ret[1])
+        plt.plot(x_data, beveerloo_flows, linestyle='None', marker='o', color='orange')
+        ret = np.polyfit(x_data, beveerloo_flows, 1)
+        plt.plot(x_data, np.array(ret[0]) * x_data + ret[1])
 
-    plt.xlabel('Apertura D [m]')
-    plt.ylabel('Caudal [partículas/s]')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     plt.title(title)
-    plt.xticks(Ds)
+    plt.xticks(x_data)
 
-    plt.tight_layout()
-    plt.show()
-
-
-def residual_energy_vs_friction_param():
-    # TODO
-    print("plot sth")
-
-    # TODO: barra de error
-
-    plt.xlabel('Energía residual promedio') # TODO: unidades
-    plt.ylabel('Parámetro de fricción [N/m]')
-    plt.title(f'Energía residual en función del parámetro de fricción')
-    # TODO: t desde cuando se empieza a promediar?
+    # aux = [format(n, '.0e') for n in x_data]
+    # plt.xticks(x_data, aux)
+    #
+    # y_ticks = [x / 1000 for x in range(1, 8)]
+    # aux = [format(n, '.0e') for n in y_ticks]
+    # plt.yticks(y_ticks, aux)
 
     plt.tight_layout()
     plt.show()
