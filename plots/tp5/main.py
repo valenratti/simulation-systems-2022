@@ -20,7 +20,6 @@ def read_csv_columns_to_lists(file_name, col_names):
 def ej1():
     print("Plots ejercicio 1...")
     ej_path = tp5_path + "ej1/"
-    Ds = [0.15, 0.18, 0.22, 0.25]
     col_names = ['time', ' caudal']
 
     times = []
@@ -36,30 +35,32 @@ def ej1():
         mean_list.append(np.mean(flow))
         stdev_list.append(np.std(flow))
 
-    # TODO: sliding window?
-    sliding_window = 5
+    plots.time_vs_sth(Ds, times, flows, 'Caudal [partículas/s]', 'Evolución temporal del caudal', 'Apertura D [m]')
+    plots.mean_and_stdev(Ds, mean_list, stdev_list, 'Valor medio y desviación estándar del caudal')
 
-    # plots.time_vs_sth(Ds, times, flows, 'Caudal [partículas/s]', 'Evolución temporal del caudal',
-    #                   f'Sliding window = {sliding_window}')
-    # plots.mean_and_stdev(Ds, mean_list, stdev_list)
-
-    return Ds, mean_list, stdev_list
+    return mean_list, stdev_list
 
 
-def ej2(Ds, mean_list):
+def ej2():
     print("Plots ejercicio 2...")
     ej_path = tp5_path + "ej2/"
 
-    for i in range(len(Ds)):
-        Q, c, error = beverloo(Ds[i], mean_list[i])     # lo mas logico seria que c dé entre 0.5 y 2
-        print(f'D = {Ds[i]}\n'
-              f'mean = {mean_list[i]}, Q = {Q}, c = {c}, error = {error}\n')
+    beverloo_flows = []
 
-    # TODO: plot mean vs beverloo_Q
+    for i in range(len(Ds)):
+        mean = mean_list[i]
+        Q, c, error = beverloo(Ds[i], mean)     # lo mas logico seria que c dé entre 0.5 y 2
+        beverloo_flows.append(Q)
+        print(f'D = {Ds[i]}\n'
+              f'mean = {mean:.3f}, Q = {Q:.3f}, c = {c}, relative error = {error / mean:.3f}, '
+              f'percentage error = {error / mean * 100:.3f} %\n')
+
+    plots.mean_and_stdev(Ds, mean_list, stdev_list, 'Ajuste del parámetro libre de la ley de Beverloo',
+                         beverloo=True, beveerloo_flows=beverloo_flows)
 
 
 def beverloo(d, mean):
-    n = 10 * 34                 # FIXME: chequear # nro de particulas que entran en el silo
+    n = 10 * 33                 # FIXME: chequear # nro de particulas que entran en el silo
     area = 1 * 0.3              # FIXME: chequear # area del silo
     n_p = n / area              # nro de particulas por unidad de volumen
     g_square_root = 3.13        # raiz de la gravedad
@@ -85,23 +86,48 @@ def beverloo(d, mean):
 def ej3():
     print("Plots ejercicio 3...")
     ej_path = tp5_path + "ej3/"
+    col_names = ['time', ' energy']
 
+    times = []
+    energies = []
+
+    for D in Ds:
+        lists = read_csv_columns_to_lists(f'{ej_path}energies-{str(D)}.csv', col_names)
+        times.append(lists[0])
+        energies.append(lists[1])
+
+    plots.time_vs_sth(Ds, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
+                      'Apertura D [m]', log_scale=True)
     # plots.time_vs_sth(Ds, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
-    #                   f'Sliding window = {sliding_window}')
+    #                   'Apertura D [m]', log_scale=True, zoom=True)
 
 
 def ej4():
     print("Plots ejercicio 4...")
     ej_path = tp5_path + "ej4/"
+    col_names = ['time', ' energy']
 
-    # plots.time_vs_sth([0], times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
-    #                   f'Sliding window = {sliding_window}, D = 0')
-    # plots.residual_energy_vs_friction_param()
+    kt_list = [200000, 400000, 600000]
+    times = []
+    energies = []
+
+    for kt in kt_list:
+        lists = read_csv_columns_to_lists(f'{ej_path}energies-0.0-{str(kt)}.0.csv', col_names)
+        times.append(lists[0])
+        energies.append(lists[1])
+
+    # TODO: energia residual?
+
+    plots.time_vs_sth(kt_list, times, energies, 'Energía [J]', 'Evolución temporal de la energía cinética',
+                      'Parametro de fricción [N/m]', suptitle=f'D = 0')
+    plots.residual_energy_vs_friction_param()
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    Ds, mean_list, stdev_list = ej1()
-    ej2(Ds, mean_list)
-    ej3()
-    ej4()
+    Ds = [0.15, 0.18, 0.22, 0.25]
+
+    mean_list, stdev_list = ej1()
+    ej2()
+    # ej3()
+    # ej4()

@@ -1,32 +1,38 @@
 from matplotlib import pyplot as plt
 import numpy as np
-import seaborn as sns
 
 
-def time_vs_sth(Ds, times, y_data, y_label, suptitle, title, log_scale=False):  # energy or flow
-    # TODO con todos los Ds en el mismo plot
-    for i in range(len(Ds)):
-        plt.plot(times[i], y_data[i], label=Ds[i])
+def time_vs_sth(labels, times, y_data, y_label, title, legend_title, suptitle=None, log_scale=False, zoom=False):  # energy or flow
+    for i in range(len(labels)):
+        plt.plot(times[i], y_data[i], label=labels[i])
 
-    plt.xlabel('tiempo [s]')
+    plt.xlabel('Tiempo [s]')
     plt.ylabel(y_label)
     plt.suptitle(suptitle)
     plt.title(title)
 
-    if log_scale:
-        plt.yscale("log")   # FIXME: log o semlog?
+    if zoom:
+        plt.ylim(1e-1, 1e1)
 
-    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title='Apertura D [m]')
+    if log_scale:
+        plt.yscale("symlog")   # FIXME: log o symlog?
+
+    plt.legend(loc='center left', bbox_to_anchor=(1, 0.5), title=legend_title)
     plt.tight_layout()
     plt.show()
 
 
-def mean_and_stdev(Ds, mean_list, stdev_list):
+def mean_and_stdev(Ds, mean_list, stdev_list, title, beverloo=False, beveerloo_flows=None):
     plt.errorbar(Ds, mean_list, stdev_list, linestyle='None', marker='o')
 
+    if beverloo:
+        plt.plot(Ds, beveerloo_flows, linestyle='None', marker='o')
+        ret = np.polyfit(Ds, beveerloo_flows, 1)
+        plt.plot(Ds, np.array(ret[0]) * Ds + ret[1])
+
     plt.xlabel('Apertura D [m]')
-    plt.ylabel('Caudal promedio [partículas/s]')
-    plt.title('Valor medio y desviación estándar del caudal')
+    plt.ylabel('Caudal [partículas/s]')
+    plt.title(title)
     plt.xticks(Ds)
 
     plt.tight_layout()
@@ -39,8 +45,8 @@ def residual_energy_vs_friction_param():
 
     # TODO: barra de error
 
-    plt.xlabel('energía residual promedio')
-    plt.ylabel('parámetro de fricción')
+    plt.xlabel('Energía residual promedio') # TODO: unidades
+    plt.ylabel('Parámetro de fricción [N/m]')
     plt.title(f'Energía residual en función del parámetro de fricción')
     # TODO: t desde cuando se empieza a promediar?
 
