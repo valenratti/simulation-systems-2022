@@ -1,5 +1,6 @@
 package utils;
 
+import granular_media.ForceException;
 import model.ForceCalculator;
 import model.Particle;
 import model.Wall;
@@ -23,7 +24,7 @@ public class Beeman {
 
     // receives the force value of the previous state of the particle (fPrev) and updates it
     // since this integrator needs the acceleration of the previous state
-    public void nextStep(final Particle particle, List<Particle> neighbours, List<Wall> walls) {
+    public void nextStep(final Particle particle, List<Particle> neighbours, List<Wall> walls) throws ForceException {
         final Vector f = force(particle, neighbours, walls);
         final double m = particle.getMass();
         final double ax = f.getX() / m, ay = f.getY() / m;
@@ -71,11 +72,11 @@ public class Beeman {
         return v + (double) 1/3 * aNext * dt + (double) 5/6 * a * dt - (double) 1/6 * aPrev * dt;
     }
 
-    private Vector force(Particle p, List<Particle> neighbours, List<Wall> walls) {
+    private Vector force(Particle p, List<Particle> neighbours, List<Wall> walls) throws ForceException {
         return forceCalculator.getForceAppliedOnParticle(p, neighbours, walls);
     }
 
-    private Particle euler(Particle particle, double dt, List<Particle> neighbours, List<Wall> walls) {
+    private Particle euler(Particle particle, double dt, List<Particle> neighbours, List<Wall> walls) throws ForceException {
         final Vector f0 = force(particle, neighbours, walls);
         final double m = particle.getMass();
         final double ax0 = f0.getX() / m, ay0 = f0.getY();

@@ -29,7 +29,7 @@ public class GranularMediaTest {
         CellIndexMethod cellIndexMethod = new CellIndexMethod(config);
         Map<Cell, List<Particle>> beforeClearing = new HashMap<>();
         cellIndexMethod.getCellMap().values().forEach((cell) -> beforeClearing.put(cell, cell.getParticleList()));
-        FileWriter.printPositions(cellIndexMethod.getArea().getParticleList());
+        FileWriter.printPositions(D, cellIndexMethod.getArea().getParticleList());
         cellIndexMethod.clear();
         cellIndexMethod.updateParticles(cellIndexMethod.getArea().getParticleList());
         Map<Cell, List<Particle>> afterUpdating = new HashMap<>();
@@ -69,9 +69,9 @@ public class GranularMediaTest {
         final CIMConfig config = new CIMConfig(L, W, D, N, minRadius, maxRadius, m, L / 10);
 
         // dt de referencia --> dt = 0.1 * sqrt(m / kn)
-        double dt = 5E-6, dt2 =1e-2;
+        double dt = 5E-5/3, dt2 =1e-2;
 //        dt = 0.1 * Math.sqrt(m / 1e5);
 
-        Simulator.simulate(config, dt, dt2);
+        Simulator.simulate(config, dt, dt2, 1e+5, 2e+5);
     }
 }

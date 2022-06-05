@@ -10,18 +10,18 @@ import java.util.List;
 public class FileWriter {
     private static BufferedWriter simulationBufferedWriter;
 
-    public static void generateXYZFile(){
+    public static void generateXYZFile(double exitWidth){
         try{
-            java.io.FileWriter fileWriter = new java.io.FileWriter("positions-" + LocalDateTime.now() + ".csv");
+            java.io.FileWriter fileWriter = new java.io.FileWriter("positions-" + exitWidth + ".csv");
             simulationBufferedWriter = new BufferedWriter(fileWriter);
         }catch(IOException e){
             System.out.println(e);
         }
     }
 
-    public static void printPositions(List<Particle> particleList) throws IOException {
+    public static void printPositions(double exitWidth, List<Particle> particleList) throws IOException {
         if(simulationBufferedWriter == null){
-            generateXYZFile();
+            generateXYZFile(exitWidth);
         }
 
         simulationBufferedWriter.write(String.valueOf(particleList.size()));
@@ -44,5 +44,39 @@ public class FileWriter {
             }
         });
         simulationBufferedWriter.flush();
+    }
+
+    public static void printCaudal(Double exitWidth, List<Vector> caudalList, double dt) throws IOException {
+        BufferedWriter simulationBufferedWriter;
+        java.io.FileWriter fileWriter = new java.io.FileWriter("caudal-" + exitWidth + ".csv");
+        simulationBufferedWriter = new BufferedWriter(fileWriter);
+        simulationBufferedWriter.write("time, caudal");
+        simulationBufferedWriter.newLine();
+        int i=1;
+        for(Vector vector : caudalList){
+            simulationBufferedWriter.write(vector.getX() + "," + vector.getY());
+            simulationBufferedWriter.newLine();
+            i++;
+        }
+        simulationBufferedWriter.flush();
+    }
+
+    public static void printEnergies(Double exitWidth, List<Vector> energies, double kt) throws IOException {
+        BufferedWriter simulationBufferedWriter;
+        java.io.FileWriter fileWriter = new java.io.FileWriter("energies-" + exitWidth + "-" + kt + ".csv");
+        simulationBufferedWriter = new BufferedWriter(fileWriter);
+        simulationBufferedWriter.write("time, energy");
+        simulationBufferedWriter.newLine();
+        int i=1;
+        for(Vector vector : energies){
+            simulationBufferedWriter.write(vector.getX() + "," + vector.getY());
+            simulationBufferedWriter.newLine();
+            i++;
+        }
+        simulationBufferedWriter.flush();
+    }
+
+    public static void reset(){
+        simulationBufferedWriter = null;
     }
 }
