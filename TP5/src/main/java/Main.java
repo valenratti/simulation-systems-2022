@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) throws IOException {
-        ej1();
+        ej4();
     }
 
     public static void ej1() throws IOException {
@@ -40,7 +40,7 @@ public class Main {
 
         double dt = 5E-5/3, dt2 =1e-2;
 
-        List<Double> kts = List.of(1e+5, 2e+5, 3e+5);
+        List<Double> kts = List.of(5e+5, 10e+5);
         final CIMConfig config = new CIMConfig(L, W, 0d, N, minRadius, maxRadius, m, L / 10);
         for(Double kt : kts) {
             Simulator.simulate(config, dt, dt2, 1e+5, kt);

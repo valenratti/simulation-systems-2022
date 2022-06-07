@@ -45,7 +45,7 @@ public class Simulator {
         // TODO: log initial state
         FileWriter.printPositions(config.getExitWidth(), particleList);
         boolean error = false;
-        while(time<=5.0 && !error) {
+        while(time<=1.5 && !error) {
             if(time != 0.0) {
                 cellIndexMethod.updateParticles(particleList);
             }
